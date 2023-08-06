@@ -183,4 +183,7 @@ src/main/resources/application-dev.yml
 # db data
 src/main/resources/data.sql
 
+### QClass
+src/main/generated/**
+
 # End of https://www.toptal.com/developers/gitignore/api/java,gradle,intellij+all,macos
