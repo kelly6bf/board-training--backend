@@ -53,6 +53,7 @@ dependencies {
 
     // Util
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'com.google.code.gson:gson:2.10.1'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     // Test
