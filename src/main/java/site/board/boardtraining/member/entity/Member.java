@@ -35,7 +35,7 @@ public class Member
     private String nickname;
 
     @Column
-    private String introduction;
+    private String introduction = "";
 
     @Enumerated(EnumType.STRING)
     @Column(length = 50, nullable = false)
@@ -50,14 +50,12 @@ public class Member
             String password,
             String email,
             String nickname,
-            String introduction,
             MemberRole role
     ) {
         this.personalId = personalId;
         this.password = password;
         this.email = email;
         this.nickname = nickname;
-        this.introduction = introduction;
         this.role = role;
     }
 
@@ -65,15 +63,13 @@ public class Member
             String personalId,
             String password,
             String email,
-            String nickname,
-            String introduction
+            String nickname
     ) {
         return new Member(
                 personalId,
                 password,
                 email,
                 nickname,
-                introduction,
                 USER
         );
     }
