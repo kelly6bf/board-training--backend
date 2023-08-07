@@ -56,6 +56,9 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10.1'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
+    // Thymeleaf
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
