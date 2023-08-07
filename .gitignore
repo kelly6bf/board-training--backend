@@ -183,6 +183,11 @@ src/main/resources/application-dev.yml
 # db data
 src/main/resources/data.sql
 
+# joke data
+src/main/resources/templates/**
+src/main/resources/static/**
+src/main/java/site/board/boardtraining/test/**
+
 ### QClass
 src/main/generated/**
 
