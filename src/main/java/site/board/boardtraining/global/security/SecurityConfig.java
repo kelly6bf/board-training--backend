@@ -136,7 +136,7 @@ public class SecurityConfig {
     }
 
     private AntPathRequestMatcher[] convertPermitPatternsToAntPathRequestMatchers() {
-        AntPathRequestMatcher[] array = PERMIT_ALL_PATTERNS.stream()
+        return PERMIT_ALL_PATTERNS.stream()
                 .map(pattern -> {
                     return new AntPathRequestMatcher(
                             pattern.get("URL"),
@@ -144,10 +144,5 @@ public class SecurityConfig {
                     );
                 })
                 .toArray(AntPathRequestMatcher[]::new);
-
-        for (AntPathRequestMatcher a : array) {
-            System.out.println("a = " + a);
-        }
-        return array;
     }
 }
