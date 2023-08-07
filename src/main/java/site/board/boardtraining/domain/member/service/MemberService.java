@@ -10,7 +10,7 @@ import site.board.boardtraining.domain.member.repository.MemberRepository;
 @Service
 public class MemberService {
 
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
 
     public MemberService(
