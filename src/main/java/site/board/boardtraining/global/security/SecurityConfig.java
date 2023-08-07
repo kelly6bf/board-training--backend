@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 public class SecurityConfig {
 
     private final ObjectMapper objectMapper;
-    private final UserDetailsService loginService;
+    private final UserDetailsService userDetailService;
     private final LoginSuccessHandler loginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
 
@@ -36,12 +36,12 @@ public class SecurityConfig {
 
     public SecurityConfig(
             ObjectMapper objectMapper,
-            UserDetailsService loginService,
+            UserDetailsService userDetailService,
             LoginSuccessHandler loginSuccessHandler,
             LoginFailureHandler loginFailureHandler
     ) {
         this.objectMapper = objectMapper;
-        this.loginService = loginService;
+        this.userDetailService = userDetailService;
         this.loginSuccessHandler = loginSuccessHandler;
         this.loginFailureHandler = loginFailureHandler;
     }
@@ -110,7 +110,7 @@ public class SecurityConfig {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 
         provider.setPasswordEncoder(passwordEncoder());
-        provider.setUserDetailsService(loginService);
+        provider.setUserDetailsService(userDetailService);
 
         return new ProviderManager(provider);
     }
