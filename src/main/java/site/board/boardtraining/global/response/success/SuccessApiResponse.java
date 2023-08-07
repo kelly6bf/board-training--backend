@@ -1,6 +1,7 @@
 package site.board.boardtraining.global.response.success;
 
 import lombok.Getter;
+import site.board.boardtraining.global.util.GsonUtil;
 
 import java.time.LocalDateTime;
 
@@ -21,5 +22,9 @@ public class SuccessApiResponse {
             final String message
     ) {
         return new SuccessApiResponse(message);
+    }
+
+    public String convertResponseToJson() {
+        return new GsonUtil().toJson(this);
     }
 }
