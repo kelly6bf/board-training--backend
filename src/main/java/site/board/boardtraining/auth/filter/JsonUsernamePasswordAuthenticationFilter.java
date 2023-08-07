@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,6 +14,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.StreamUtils;
+import site.board.boardtraining.auth.dto.LoginRequest;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -50,32 +50,48 @@ public class JsonUsernamePasswordAuthenticationFilter
             HttpServletResponse response
     ) throws AuthenticationException, IOException, ServletException {
 
-        if (request.getContentType() == null || !request.getContentType().equals(CONTENT_TYPE)) {
-            throw new AuthenticationServiceException("Authentication Content-Type not supported: " + request.getContentType());
-        }
+        validateContentType(request);
 
-        LoginDto loginDto = objectMapper.readValue(StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8), LoginDto.class);
+        LoginRequest loginRequest = parseLoginRequest(request);
 
-        String personalId = loginDto.getPersonalId();
-        String password = loginDto.getPassword();
+        validateLoginRequest(loginRequest);
 
-        if (personalId == null || password == null) {
-            throw new AuthenticationServiceException("DATA IS MISS");
-        }
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                loginRequest.personalId(),
+                loginRequest.password()
+        );
+        setDetails(request, authenticationToken);
 
-        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(personalId, password);
-
-        setDetails(request, authRequest);
-        return this.getAuthenticationManager().authenticate(authRequest);
+        return this.getAuthenticationManager().authenticate(authenticationToken);
     }
 
-    protected void setDetails(HttpServletRequest request, UsernamePasswordAuthenticationToken authRequest) {
+    private void setDetails(
+            HttpServletRequest request,
+            UsernamePasswordAuthenticationToken authRequest
+    ) {
         authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
     }
 
-    @Data
-    private static class LoginDto {
-        String personalId;
-        String password;
+    private void validateContentType(HttpServletRequest request) {
+        if (request.getContentType() == null || !request.getContentType().equals(CONTENT_TYPE)) {
+            throw new AuthenticationServiceException("Authentication Content-Type not supported: " + request.getContentType());
+        }
+    }
+
+    private LoginRequest parseLoginRequest(HttpServletRequest request)
+            throws IOException {
+        return objectMapper.readValue(
+                StreamUtils.copyToString(
+                        request.getInputStream(),
+                        StandardCharsets.UTF_8
+                ),
+                LoginRequest.class
+        );
+    }
+
+    private void validateLoginRequest(LoginRequest loginRequest) {
+        if (loginRequest.personalId() == null || loginRequest.password() == null) {
+            throw new AuthenticationServiceException("DATA IS MISS");
+        }
     }
 }

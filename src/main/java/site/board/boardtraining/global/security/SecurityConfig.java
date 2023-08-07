@@ -1,7 +1,6 @@
 package site.board.boardtraining.global.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,7 +23,6 @@ import site.board.boardtraining.auth.handler.LoginSuccessHandler;
 import java.util.stream.Stream;
 
 @Configuration
-@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final ObjectMapper objectMapper;
@@ -36,18 +34,31 @@ public class SecurityConfig {
             "/api/login"
     };
 
+    public SecurityConfig(
+            ObjectMapper objectMapper,
+            UserDetailsService loginService,
+            LoginSuccessHandler loginSuccessHandler,
+            LoginFailureHandler loginFailureHandler
+    ) {
+        this.objectMapper = objectMapper;
+        this.loginService = loginService;
+        this.loginSuccessHandler = loginSuccessHandler;
+        this.loginFailureHandler = loginFailureHandler;
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable);
+                .httpBasic(AbstractHttpConfigurer::disable);
 
-        http.logout(logout -> logout
-                .logoutUrl("/api/logout")
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
-        );
+        http
+                .logout(logout -> logout
+                    .logoutUrl("/api/logout")
+                    .invalidateHttpSession(true)
+                    .deleteCookies("JSESSIONID")
+                );
 
         http
                 .authorizeHttpRequests(request -> request
@@ -69,14 +80,23 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 );
 
-        http.addFilterBefore(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http
+                .addFilterBefore(
+                    jsonUsernamePasswordAuthenticationFilter(),
+                    UsernamePasswordAuthenticationFilter.class
+                );
 
         return http.build();
     }
 
     @Bean
     public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter() {
-        JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter = new JsonUsernamePasswordAuthenticationFilter(objectMapper, loginSuccessHandler, loginFailureHandler);
+        JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter =
+                new JsonUsernamePasswordAuthenticationFilter(
+                        objectMapper,
+                        loginSuccessHandler,
+                        loginFailureHandler
+                );
         jsonUsernamePasswordAuthenticationFilter.setAuthenticationManager(authenticationManager());
 
         SecurityContextRepository contextRepository = new HttpSessionSecurityContextRepository();
