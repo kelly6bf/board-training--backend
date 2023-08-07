@@ -1,8 +1,12 @@
 package site.board.boardtraining.global.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -10,48 +14,40 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
-import site.board.boardtraining.auth.filter.JsonIdPwAuthenticationFilter;
+import site.board.boardtraining.auth.filter.JsonUsernamePasswordAuthenticationFilter;
+import site.board.boardtraining.auth.handler.LoginFailureHandler;
+import site.board.boardtraining.auth.handler.LoginSuccessHandler;
 
 import java.util.stream.Stream;
 
-import static org.springframework.http.HttpMethod.POST;
-
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final UserDetailsService userDetailsService;
-    private final AuthenticationConfiguration authenticationConfiguration;
+    private final ObjectMapper objectMapper;
+    private final UserDetailsService loginService;
+    private final LoginSuccessHandler loginSuccessHandler;
+    private final LoginFailureHandler loginFailureHandler;
 
-    private static final RequestMatcher LOGIN_REQUEST_MATCHER = new AntPathRequestMatcher("/api/login", POST.name());
     private static final String[] PERMIT_ALL_PATTERNS = new String[]{
             "/api/login"
     };
 
-    public SecurityConfig(
-            UserDetailsService userDetailsService,
-            AuthenticationConfiguration authenticationConfiguration
-    ) {
-        this.userDetailsService = userDetailsService;
-        this.authenticationConfiguration = authenticationConfiguration;
-    }
-
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable);
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable);
 
-        http.addFilterAt(
-                new JsonIdPwAuthenticationFilter(
-                        authenticationConfiguration.getAuthenticationManager(),
-                        LOGIN_REQUEST_MATCHER
-                ),
-                UsernamePasswordAuthenticationFilter.class
+        http.logout(logout -> logout
+                .logoutUrl("/api/logout")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
         );
-
-        http.userDetailsService(userDetailsService);
 
         http
                 .authorizeHttpRequests(request -> request
@@ -62,10 +58,41 @@ public class SecurityConfig {
                                         .toArray(AntPathRequestMatcher[]::new)
                         )
                         .permitAll()
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/api/user")
+                        )
+                        .hasRole("USER")
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/api/admin")
+                        )
+                        .hasRole("ADMIN")
                         .anyRequest().authenticated()
                 );
 
+        http.addFilterBefore(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
+    }
+
+    @Bean
+    public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter() {
+        JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter = new JsonUsernamePasswordAuthenticationFilter(objectMapper, loginSuccessHandler, loginFailureHandler);
+        jsonUsernamePasswordAuthenticationFilter.setAuthenticationManager(authenticationManager());
+
+        SecurityContextRepository contextRepository = new HttpSessionSecurityContextRepository();
+        jsonUsernamePasswordAuthenticationFilter.setSecurityContextRepository(contextRepository);
+
+        return jsonUsernamePasswordAuthenticationFilter;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+
+        provider.setPasswordEncoder(passwordEncoder());
+        provider.setUserDetailsService(loginService);
+
+        return new ProviderManager(provider);
     }
 
     @Bean
