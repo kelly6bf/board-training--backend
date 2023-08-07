@@ -16,7 +16,7 @@ import static site.board.boardtraining.domain.auth.exception.AuthErrorCode.INVAL
 
 @Slf4j
 @Component
-public class LoginFailureHandler implements AuthenticationFailureHandler {
+public class CustomLoginFailureHandler implements AuthenticationFailureHandler {
 
     @Override
     public void onAuthenticationFailure(
