@@ -10,7 +10,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -32,6 +31,7 @@ public class SecurityConfig {
 
     private final ObjectMapper objectMapper;
     private final UserDetailsService userDetailService;
+    private final PasswordEncoder passwordEncoder;
     private final LoginSuccessHandler loginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
 
@@ -43,17 +43,23 @@ public class SecurityConfig {
             Map.of(
                     "URL", "/",
                     "METHOD", GET.name()
+            ),
+            Map.of(
+                    "URL", "/api/members",
+                    "METHOD", POST.name()
             )
     );
 
     public SecurityConfig(
             ObjectMapper objectMapper,
             UserDetailsService userDetailService,
+            PasswordEncoder passwordEncoder,
             LoginSuccessHandler loginSuccessHandler,
             LoginFailureHandler loginFailureHandler
     ) {
         this.objectMapper = objectMapper;
         this.userDetailService = userDetailService;
+        this.passwordEncoder = passwordEncoder;
         this.loginSuccessHandler = loginSuccessHandler;
         this.loginFailureHandler = loginFailureHandler;
     }
@@ -123,15 +129,10 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 
-        provider.setPasswordEncoder(passwordEncoder());
+        provider.setPasswordEncoder(passwordEncoder);
         provider.setUserDetailsService(userDetailService);
 
         return new ProviderManager(provider);
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     private AntPathRequestMatcher[] convertPermitPatternsToAntPathRequestMatchers() {
