@@ -16,9 +16,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import site.board.boardtraining.auth.filter.JsonUsernamePasswordAuthenticationFilter;
-import site.board.boardtraining.auth.handler.LoginFailureHandler;
-import site.board.boardtraining.auth.handler.LoginSuccessHandler;
+import site.board.boardtraining.domain.auth.filter.JsonUsernamePasswordAuthenticationFilter;
+import site.board.boardtraining.domain.auth.handler.LoginFailureHandler;
+import site.board.boardtraining.domain.auth.handler.LoginSuccessHandler;
 
 import java.util.List;
 import java.util.Map;
