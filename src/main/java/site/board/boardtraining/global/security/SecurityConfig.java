@@ -12,13 +12,17 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import site.board.boardtraining.domain.auth.filter.JsonUsernamePasswordAuthenticationFilter;
-import site.board.boardtraining.domain.auth.handler.LoginFailureHandler;
-import site.board.boardtraining.domain.auth.handler.LoginSuccessHandler;
+import site.board.boardtraining.domain.auth.handler.CustomLoginFailureHandler;
+import site.board.boardtraining.domain.auth.handler.CustomLoginSuccessHandler;
+import site.board.boardtraining.domain.auth.handler.CustomLogoutSuccessHandler;
 
 import java.util.List;
 import java.util.Map;
@@ -32,8 +36,9 @@ public class SecurityConfig {
     private final ObjectMapper objectMapper;
     private final UserDetailsService userDetailService;
     private final PasswordEncoder passwordEncoder;
-    private final LoginSuccessHandler loginSuccessHandler;
-    private final LoginFailureHandler loginFailureHandler;
+    private final AuthenticationSuccessHandler customLoginSuccessHandler;
+    private final AuthenticationFailureHandler customLoginFailureHandler;
+    private final LogoutSuccessHandler customLogoutSuccessHandler;
 
     private static final List<Map<String, String>> PERMIT_ALL_PATTERNS = List.of(
             Map.of(
@@ -54,14 +59,16 @@ public class SecurityConfig {
             ObjectMapper objectMapper,
             UserDetailsService userDetailService,
             PasswordEncoder passwordEncoder,
-            LoginSuccessHandler loginSuccessHandler,
-            LoginFailureHandler loginFailureHandler
+            CustomLoginSuccessHandler customLoginSuccessHandler,
+            CustomLoginFailureHandler customLoginFailureHandler,
+            CustomLogoutSuccessHandler customLogoutSuccessHandler
     ) {
         this.objectMapper = objectMapper;
         this.userDetailService = userDetailService;
         this.passwordEncoder = passwordEncoder;
-        this.loginSuccessHandler = loginSuccessHandler;
-        this.loginFailureHandler = loginFailureHandler;
+        this.customLoginSuccessHandler = customLoginSuccessHandler;
+        this.customLoginFailureHandler = customLoginFailureHandler;
+        this.customLogoutSuccessHandler = customLogoutSuccessHandler;
     }
 
     @Bean
@@ -75,9 +82,7 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/api/logout")
                         .invalidateHttpSession(true)
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            response.sendRedirect("/");
-                        })
+                        .logoutSuccessHandler(customLogoutSuccessHandler)
                         .deleteCookies("JSESSIONID")
                 );
 
@@ -114,8 +119,8 @@ public class SecurityConfig {
         JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter =
                 new JsonUsernamePasswordAuthenticationFilter(
                         objectMapper,
-                        loginSuccessHandler,
-                        loginFailureHandler
+                        customLoginSuccessHandler,
+                        customLoginFailureHandler
                 );
         jsonUsernamePasswordAuthenticationFilter.setAuthenticationManager(authenticationManager());
 
