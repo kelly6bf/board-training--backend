@@ -14,7 +14,6 @@ import static site.board.boardtraining.domain.member.constant.MemberStatus.ACTIV
 
 public class CustomUserPrincipal
         implements UserDetails {
-
     private String personalId;
     private String password;
     private MemberStatus memberStatus;
