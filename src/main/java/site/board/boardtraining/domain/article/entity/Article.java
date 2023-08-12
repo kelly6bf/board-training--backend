@@ -67,6 +67,16 @@ public class Article
         );
     }
 
+    public void update(
+            String title,
+            String content,
+            ArticleStatus status
+    ) {
+        this.title = title;
+        this.content = content;
+        this.status = status;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
