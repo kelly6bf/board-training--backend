@@ -1,4 +1,6 @@
-package site.board.boardtraining.domain.member.dto;
+package site.board.boardtraining.domain.member.dto.api;
+
+import site.board.boardtraining.domain.member.dto.business.CreateMemberDto;
 
 public record CreateMemberRequest(
         String personalId,
@@ -6,13 +8,13 @@ public record CreateMemberRequest(
         String email,
         String nickname
 ) {
-    public static CreateMemberRequest of(
+    public static CreateMemberDto of(
             String personalId,
             String password,
             String email,
             String nickname
     ) {
-        return new CreateMemberRequest(
+        return new CreateMemberDto(
                 personalId,
                 password,
                 email,
