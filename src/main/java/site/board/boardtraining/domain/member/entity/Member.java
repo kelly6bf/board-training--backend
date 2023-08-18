@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import site.board.boardtraining.domain.member.constant.LoginProvider;
 import site.board.boardtraining.domain.member.constant.MemberStatus;
 import site.board.boardtraining.global.audit.BaseTimeEntity;
 import site.board.boardtraining.domain.member.constant.MemberRole;
@@ -30,11 +31,15 @@ public class Member
     @Column(length = 100, nullable = false, unique = true)
     private String email;
 
-    @Column(length = 100, nullable = false, unique = true)
+    @Column(length = 50, nullable = false, unique = true)
     private String nickname;
 
-    @Column
+    @Column(length = 300, nullable = false)
     private String introduction = "";
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 50, nullable = false)
+    private LoginProvider loginProvider;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 50, nullable = false)
@@ -49,12 +54,14 @@ public class Member
             String password,
             String email,
             String nickname,
+            LoginProvider loginProvider,
             MemberRole role
     ) {
         this.personalId = personalId;
         this.password = password;
         this.email = email;
         this.nickname = nickname;
+        this.loginProvider = loginProvider;
         this.role = role;
     }
 
@@ -62,13 +69,15 @@ public class Member
             String personalId,
             String password,
             String email,
-            String nickname
+            String nickname,
+            LoginProvider loginProvider
     ) {
         return new Member(
                 personalId,
                 password,
                 email,
                 nickname,
+                loginProvider,
                 USER
         );
     }
