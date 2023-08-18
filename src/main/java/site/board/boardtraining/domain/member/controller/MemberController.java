@@ -1,13 +1,11 @@
 package site.board.boardtraining.domain.member.controller;
 
-import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import site.board.boardtraining.domain.member.dto.business.CreateMemberDto;
-import site.board.boardtraining.domain.member.dto.api.CreateMemberRequest;
+import site.board.boardtraining.domain.member.dto.api.CreateLocalAuthenticationMemberRequest;
 import site.board.boardtraining.domain.member.service.MemberService;
 import site.board.boardtraining.global.response.success.SingleSuccessApiResponse;
 import site.board.boardtraining.global.response.success.SuccessApiResponse;
@@ -22,18 +20,12 @@ public class MemberController {
         this.memberService = memberService;
     }
 
-    @Transactional
     @PostMapping
     public ResponseEntity<SuccessApiResponse> createMember(
-            @RequestBody CreateMemberRequest request
+            @RequestBody CreateLocalAuthenticationMemberRequest request
     ) {
         memberService.createMember(
-                CreateMemberDto.of(
-                        request.personalId(),
-                        request.password(),
-                        request.email(),
-                        request.nickname()
-                )
+                request.toDto()
         );
 
         return ResponseEntity.ok(

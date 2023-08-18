@@ -27,8 +27,10 @@ public class MemberServiceImpl
                         dto.personalId(),
                         passwordEncoder.encode(dto.password()),
                         dto.email(),
-                        dto.nickname()
+                        dto.nickname(),
+                        dto.loginProvider()
                 )
-        ).getId();
+        )
+                .getId();
     }
 }
