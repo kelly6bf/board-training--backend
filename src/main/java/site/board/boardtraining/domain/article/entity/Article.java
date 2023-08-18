@@ -31,7 +31,7 @@ public class Article
     @Column(nullable = false)
     private String title;
 
-    @Column(length = 10000, nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
     @Enumerated(EnumType.STRING)
@@ -65,6 +65,16 @@ public class Article
                 status,
                 member
         );
+    }
+
+    public void update(
+            String title,
+            String content,
+            ArticleStatus status
+    ) {
+        this.title = title;
+        this.content = content;
+        this.status = status;
     }
 
     @Override

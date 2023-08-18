@@ -1,4 +1,4 @@
-package site.board.boardtraining.domain.member.dto;
+package site.board.boardtraining.domain.member.dto.api;
 
 import site.board.boardtraining.domain.member.entity.Member;
 
