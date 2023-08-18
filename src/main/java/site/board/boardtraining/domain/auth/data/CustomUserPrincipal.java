@@ -1,5 +1,6 @@
 package site.board.boardtraining.domain.auth.data;
 
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,19 +13,23 @@ import java.util.List;
 
 import static site.board.boardtraining.domain.member.constant.MemberStatus.ACTIVE;
 
+@Getter
 public class CustomUserPrincipal
         implements UserDetails {
+    private Long memberId;
     private String personalId;
     private String password;
     private MemberStatus memberStatus;
     private Collection<? extends GrantedAuthority> authorities;
 
     private CustomUserPrincipal(
+            Long memberId,
             String personalId,
             String password,
             MemberStatus memberStatus,
             Collection<? extends GrantedAuthority> authorities
     ) {
+        this.memberId = memberId;
         this.personalId = personalId;
         this.password = password;
         this.memberStatus = memberStatus;
@@ -33,6 +38,7 @@ public class CustomUserPrincipal
 
     public static CustomUserPrincipal from(Member member) {
         return new CustomUserPrincipal(
+                member.getId(),
                 member.getPersonalId(),
                 member.getPassword(),
                 member.getStatus(),
