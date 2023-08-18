@@ -31,7 +31,7 @@ public class Article
     @Column(nullable = false)
     private String title;
 
-    @Column(length = 10000, nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
     @Enumerated(EnumType.STRING)
