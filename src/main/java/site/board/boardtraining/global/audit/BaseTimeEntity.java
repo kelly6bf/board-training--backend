@@ -18,11 +18,11 @@ public abstract class BaseTimeEntity {
 
     @CreatedDate
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    @Column(nullable = false, updatable = false)
+    @Column(columnDefinition = "TIMESTAMP", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    @Column(nullable = false)
-    private LocalDateTime modifiedAt;
+    @Column(columnDefinition = "TIMESTAMP", nullable = false)
+    private LocalDateTime updatedAt;
 }
