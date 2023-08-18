@@ -10,6 +10,8 @@ import site.board.boardtraining.global.audit.BaseTimeEntity;
 
 import java.util.Objects;
 
+import static site.board.boardtraining.domain.board.constant.BoardStatus.*;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -24,44 +26,40 @@ public class Board
     private String title;
 
     @Column(length = 100, nullable = false)
-    private String introduction;
+    private String description;
 
     @Column(length = 1000, nullable = false)
     private String thumbnailImageUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 50, nullable = false)
-    private BoardStatus status;
+    private BoardStatus status = ACTIVE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
     private Board(
             String title,
-            String introduction,
+            String description,
             String thumbnailImageUrl,
-            BoardStatus status,
             Member member
     ) {
         this.title = title;
-        this.introduction = introduction;
+        this.description = description;
         this.thumbnailImageUrl = thumbnailImageUrl;
-        this.status = status;
         this.member = member;
     }
 
     public static Board of(
             String title,
-            String introduction,
+            String description,
             String thumbnailImageUrl,
-            BoardStatus status,
             Member member
     ) {
         return new Board(
                 title,
-                introduction,
+                description,
                 thumbnailImageUrl,
-                status,
                 member
         );
     }
