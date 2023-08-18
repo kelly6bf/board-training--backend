@@ -64,6 +64,16 @@ public class Board
         );
     }
 
+    public void update(
+            String title,
+            String description,
+            String thumbnailImageUrl
+    ) {
+        this.title = title;
+        this.description = description;
+        this.thumbnailImageUrl = thumbnailImageUrl;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
