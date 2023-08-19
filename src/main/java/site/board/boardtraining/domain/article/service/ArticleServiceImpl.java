@@ -1,11 +1,9 @@
 package site.board.boardtraining.domain.article.service;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import site.board.boardtraining.domain.article.dto.business.ArticleDto;
-import site.board.boardtraining.domain.article.dto.business.CreateArticleDto;
-import site.board.boardtraining.domain.article.dto.business.DeleteArticleDto;
-import site.board.boardtraining.domain.article.dto.business.UpdateArticleDto;
+import site.board.boardtraining.domain.article.dto.business.*;
 import site.board.boardtraining.domain.article.entity.Article;
 import site.board.boardtraining.domain.article.repository.ArticleRepository;
 import site.board.boardtraining.domain.board.repository.BoardRepository;
@@ -35,10 +33,27 @@ public class ArticleServiceImpl
 
     @Transactional(readOnly = true)
     @Override
+    public Page<ArticleDto> searchArticles(SearchArticlesDto dto) {
+        if (dto.searchKeyword() == null || dto.searchKeyword().isBlank()) {
+            return articleRepository.findAll(dto.pageable())
+                    .map(ArticleDto::from);
+        }
+
+        return articleRepository.findByBoard_IdAndTitleContainingOrContentContaining(
+                        dto.boardId(),
+                        dto.searchKeyword(),
+                        dto.searchKeyword(),
+                        dto.pageable()
+                )
+                .map(ArticleDto::from);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
     public ArticleDto getArticle(Long articleId) {
-        return ArticleDto.from(
-                findArticleEntity(articleId)
-        );
+        return articleRepository.findById(articleId)
+                .map(ArticleDto::from)
+                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_NOT_FOUND));
     }
 
     @Override
@@ -81,10 +96,5 @@ public class ArticleServiceImpl
     ) {
         if (!article.getMember().getId().equals(memberId))
             throw new UnauthorizedResourceAccessException();
-    }
-
-    private Article findArticleEntity(Long articleId) {
-        return articleRepository.findById(articleId)
-                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_NOT_FOUND));
     }
 }

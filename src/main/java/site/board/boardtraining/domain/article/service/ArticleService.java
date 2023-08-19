@@ -1,11 +1,12 @@
 package site.board.boardtraining.domain.article.service;
 
-import site.board.boardtraining.domain.article.dto.business.ArticleDto;
-import site.board.boardtraining.domain.article.dto.business.CreateArticleDto;
-import site.board.boardtraining.domain.article.dto.business.DeleteArticleDto;
-import site.board.boardtraining.domain.article.dto.business.UpdateArticleDto;
+import org.springframework.data.domain.Page;
+import site.board.boardtraining.domain.article.dto.business.*;
 
 public interface ArticleService {
+
+    Page<ArticleDto> searchArticles(SearchArticlesDto dto);
+
     ArticleDto getArticle(Long articleId);
 
     Long createArticle(CreateArticleDto dto);
