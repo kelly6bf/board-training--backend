@@ -32,7 +32,6 @@ public class ArticleController {
             @RequestParam(required = false) String searchKeyword,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        System.out.println("searchKeyword = " + searchKeyword);
         return ResponseEntity.ok(
                 MultipleSuccessApiResponse.of(
                         "성공적으로 게시글이 조회되었습니다.",
