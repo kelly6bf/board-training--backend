@@ -33,9 +33,10 @@ public class ArticleController {
         );
     }
 
-    @PostMapping("/api/articles")
+    @PostMapping("/api/boards/{board-id}/articles")
     public ResponseEntity<SingleSuccessApiResponse<CreateArticleResponse>> createArticle(
             @AuthenticationPrincipal CustomUserPrincipal principal,
+            @PathVariable("board-id") Long boardId,
             @RequestBody CreateArticleRequest request
     ) {
         return ResponseEntity.ok(
@@ -43,7 +44,10 @@ public class ArticleController {
                         "성공적으로 게시글이 생성되었습니다.",
                         CreateArticleResponse.of(
                                 articleService.createArticle(
-                                        request.toDto(principal.getUsername())
+                                        request.toDto(
+                                                boardId,
+                                                principal.getMemberId()
+                                        )
                                 )
                         )
                 )
@@ -59,7 +63,7 @@ public class ArticleController {
         articleService.updateArticle(
                 request.toDto(
                         articleId,
-                        principal.getUsername()
+                        principal.getMemberId()
                 )
         );
         return ResponseEntity.ok(
@@ -77,7 +81,7 @@ public class ArticleController {
         articleService.deleteArticle(
                 DeleteArticleDto.of(
                         articleId,
-                        principal.getUsername()
+                        principal.getMemberId()
                 )
         );
         return ResponseEntity.ok(

@@ -8,12 +8,16 @@ public record CreateArticleRequest(
         String content,
         ArticleStatus status
 ) {
-    public CreateArticleDto toDto(String memberPersonalId) {
+    public CreateArticleDto toDto(
+            Long boardId,
+            Long memberId
+    ) {
         return CreateArticleDto.of(
                 title,
                 content,
                 status,
-                memberPersonalId
+                boardId,
+                memberId
         );
     }
 }

@@ -22,15 +22,15 @@ public class MemberServiceImpl
     }
 
     public Long createMember(CreateMemberDto dto) {
-        return memberRepository.save(
-                Member.createUser(
+        Member createMember = memberRepository.save(
+                Member.of(
                         dto.personalId(),
                         passwordEncoder.encode(dto.password()),
                         dto.email(),
                         dto.nickname(),
                         dto.loginProvider()
                 )
-        )
-                .getId();
+        );
+        return createMember.getId();
     }
 }

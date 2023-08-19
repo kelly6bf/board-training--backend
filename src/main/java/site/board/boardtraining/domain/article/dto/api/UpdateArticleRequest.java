@@ -10,14 +10,14 @@ public record UpdateArticleRequest(
 ) {
     public UpdateArticleDto toDto(
             Long articleId,
-            String memberPersonalId
+            Long memberId
     ) {
         return UpdateArticleDto.of(
                 articleId,
                 title,
                 content,
                 status,
-                memberPersonalId
+                memberId
         );
     }
 }
