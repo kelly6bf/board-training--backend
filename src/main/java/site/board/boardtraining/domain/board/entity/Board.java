@@ -14,6 +14,7 @@ import static site.board.boardtraining.domain.board.constant.BoardStatus.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "board")
 @Entity
 public class Board
         extends BaseTimeEntity {
