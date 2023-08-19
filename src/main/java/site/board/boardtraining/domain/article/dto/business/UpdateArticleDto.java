@@ -7,7 +7,6 @@ public record UpdateArticleDto(
         String title,
         String content,
         ArticleStatus status,
-        Long boardId,
         Long memberId
 ) {
     public static UpdateArticleDto of(
@@ -15,7 +14,6 @@ public record UpdateArticleDto(
             String title,
             String content,
             ArticleStatus status,
-            Long boardId,
             Long memberId
     ) {
         return new UpdateArticleDto(
@@ -23,7 +21,6 @@ public record UpdateArticleDto(
                 title,
                 content,
                 status,
-                boardId,
                 memberId
         );
     }
