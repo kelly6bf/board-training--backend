@@ -8,7 +8,7 @@ import site.board.boardtraining.domain.board.dto.DeleteBoardDto;
 import site.board.boardtraining.domain.board.dto.UpdateBoardDto;
 import site.board.boardtraining.domain.board.entity.Board;
 import site.board.boardtraining.domain.board.repository.BoardRepository;
-import site.board.boardtraining.domain.member.entity.Member;
+import site.board.boardtraining.domain.member.repository.MemberRepository;
 import site.board.boardtraining.global.exception.ResourceNotFoundException;
 import site.board.boardtraining.global.exception.UnauthorizedResourceAccessException;
 
@@ -23,11 +23,17 @@ public class BoardServiceImpl
         implements BoardService {
 
     private final BoardRepository boardRepository;
+    private final MemberRepository memberRepository;
 
-    public BoardServiceImpl(BoardRepository boardRepository) {
+    public BoardServiceImpl(
+            BoardRepository boardRepository,
+            MemberRepository memberRepository
+    ) {
         this.boardRepository = boardRepository;
+        this.memberRepository = memberRepository;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public BoardDto getBoard(Long boardId) {
         return BoardDto.from(
@@ -36,6 +42,7 @@ public class BoardServiceImpl
         );
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<BoardDto> getAllBoard() {
         return boardRepository.findAll()
@@ -46,7 +53,12 @@ public class BoardServiceImpl
 
     @Override
     public Long createBoard(CreateBoardDto dto) {
-        return boardRepository.save(dto.toEntity()).getId();
+        Board createdBoard = boardRepository.save(
+                dto.toEntity(
+                        memberRepository.getReferenceById(dto.memberId())
+                )
+        );
+        return createdBoard.getId();
     }
 
     @Override
@@ -55,7 +67,7 @@ public class BoardServiceImpl
 
         verifyBoardOwner(
                 savedBoard,
-                dto.member()
+                dto.memberId()
         );
 
         savedBoard.update(
@@ -71,7 +83,7 @@ public class BoardServiceImpl
 
         verifyBoardOwner(
                 savedBoard,
-                dto.member()
+                dto.memberId()
         );
 
         boardRepository.delete(savedBoard);
@@ -79,9 +91,9 @@ public class BoardServiceImpl
 
     private void verifyBoardOwner(
             Board board,
-            Member member
+            Long memberId
     ) {
-        if (!board.getMember().equals(member))
+        if (!board.getMember().getId().equals(memberId))
             throw new UnauthorizedResourceAccessException();
     }
 }

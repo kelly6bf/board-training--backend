@@ -7,23 +7,23 @@ public record CreateBoardDto(
         String title,
         String description,
         String thumbnailImageUrl,
-        Member member
+        Long memberId
 ) {
     public static CreateBoardDto of(
             String title,
             String description,
             String thumbnailImageUrl,
-            Member member
+            Long memberId
     ) {
         return new CreateBoardDto(
                 title,
                 description,
                 thumbnailImageUrl,
-                member
+                memberId
         );
     }
 
-    public Board toEntity() {
+    public Board toEntity(Member member) {
         return Board.of(
                 title,
                 description,

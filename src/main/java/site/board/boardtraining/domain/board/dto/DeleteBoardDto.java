@@ -1,18 +1,16 @@
 package site.board.boardtraining.domain.board.dto;
 
-import site.board.boardtraining.domain.member.entity.Member;
-
 public record DeleteBoardDto(
         Long boardId,
-        Member member
+        Long memberId
 ) {
     public static DeleteBoardDto of(
             Long boardId,
-            Member member
+            Long memberId
     ) {
         return new DeleteBoardDto(
                 boardId,
-                member
+                memberId
         );
     }
 }
