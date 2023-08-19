@@ -65,7 +65,7 @@ public class Member
         this.role = role;
     }
 
-    public static Member createUser(
+    public static Member of(
             String personalId,
             String password,
             String email,

@@ -2,15 +2,15 @@ package site.board.boardtraining.domain.article.dto.business;
 
 public record DeleteArticleDto(
         Long articleId,
-        String memberPersonalId
+        Long memberId
 ) {
     public static DeleteArticleDto of(
             Long articleId,
-            String memberPersonalId
+            Long memberId
     ) {
         return new DeleteArticleDto(
                 articleId,
-                memberPersonalId
+                memberId
         );
     }
 }

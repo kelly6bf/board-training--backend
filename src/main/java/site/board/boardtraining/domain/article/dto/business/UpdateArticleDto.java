@@ -7,21 +7,21 @@ public record UpdateArticleDto(
         String title,
         String content,
         ArticleStatus status,
-        String memberPersonalId
+        Long memberId
 ) {
     public static UpdateArticleDto of(
             Long articleId,
             String title,
             String content,
             ArticleStatus status,
-            String memberPersonalId
+            Long memberId
     ) {
         return new UpdateArticleDto(
                 articleId,
                 title,
                 content,
                 status,
-                memberPersonalId
+                memberId
         );
     }
 }

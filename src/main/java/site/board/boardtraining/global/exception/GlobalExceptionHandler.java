@@ -1,6 +1,5 @@
 package site.board.boardtraining.global.exception;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,10 +13,10 @@ import static site.board.boardtraining.global.exception.GlobalErrorCode.RESOURCE
 public class GlobalExceptionHandler {
 
     @ExceptionHandler
-    protected ResponseEntity<ErrorApiResponse> handleEntityNotFoundException(
-            EntityNotFoundException e
+    protected ResponseEntity<ErrorApiResponse> handleResourceNotFoundException(
+            ResourceNotFoundException e
     ) {
-        log.error("[handle EntityNotFoundException] - {}", e.getMessage());
+        log.error("[handle ResourceNotFoundException] - {}", e.getMessage());
 
         return new ResponseEntity<>(
                 ErrorApiResponse.of(

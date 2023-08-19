@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import site.board.boardtraining.domain.article.constant.ArticleStatus;
+import site.board.boardtraining.domain.board.entity.Board;
 import site.board.boardtraining.global.audit.BaseEntity;
 import site.board.boardtraining.domain.member.entity.Member;
 
@@ -39,17 +40,22 @@ public class Article
     private ArticleStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    private Board board;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
     private Article(
             String title,
             String content,
             ArticleStatus status,
+            Board board,
             Member member
     ) {
         this.title = title;
         this.content = content;
         this.status = status;
+        this.board = board;
         this.member = member;
     }
 
@@ -57,12 +63,14 @@ public class Article
             String title,
             String content,
             ArticleStatus status,
+            Board board,
             Member member
     ) {
         return new Article(
                 title,
                 content,
                 status,
+                board,
                 member
         );
     }
