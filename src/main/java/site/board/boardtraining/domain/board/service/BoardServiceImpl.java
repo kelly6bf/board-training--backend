@@ -1,19 +1,14 @@
 package site.board.boardtraining.domain.board.service;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import site.board.boardtraining.domain.board.dto.BoardDto;
-import site.board.boardtraining.domain.board.dto.CreateBoardDto;
-import site.board.boardtraining.domain.board.dto.DeleteBoardDto;
-import site.board.boardtraining.domain.board.dto.UpdateBoardDto;
+import site.board.boardtraining.domain.board.dto.business.*;
 import site.board.boardtraining.domain.board.entity.Board;
 import site.board.boardtraining.domain.board.repository.BoardRepository;
 import site.board.boardtraining.domain.member.repository.MemberRepository;
 import site.board.boardtraining.global.exception.ResourceNotFoundException;
 import site.board.boardtraining.global.exception.UnauthorizedResourceAccessException;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static site.board.boardtraining.domain.board.exception.BoardErrorCode.BOARD_NOT_FOUND;
 
@@ -35,20 +30,20 @@ public class BoardServiceImpl
 
     @Transactional(readOnly = true)
     @Override
-    public BoardDto getBoard(Long boardId) {
-        return BoardDto.from(
-                boardRepository.findById(boardId)
-                        .orElseThrow(() -> new ResourceNotFoundException(BOARD_NOT_FOUND))
-        );
+    public Page<BoardDto> searchBoards(SearchBoardsDto dto) {
+        return boardRepository.findByTitleContaining(
+                        dto.searchKeyword(),
+                        dto.pageable()
+                )
+                .map(BoardDto::from);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<BoardDto> getAllBoard() {
-        return boardRepository.findAll()
-                .stream()
+    public BoardDto getBoard(Long boardId) {
+        return boardRepository.findById(boardId)
                 .map(BoardDto::from)
-                .collect(Collectors.toList());
+                .orElseThrow(() -> new ResourceNotFoundException(BOARD_NOT_FOUND));
     }
 
     @Override

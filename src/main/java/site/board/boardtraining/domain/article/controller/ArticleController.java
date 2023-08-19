@@ -1,5 +1,8 @@
 package site.board.boardtraining.domain.article.controller;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -8,8 +11,10 @@ import site.board.boardtraining.domain.article.dto.api.CreateArticleResponse;
 import site.board.boardtraining.domain.article.dto.api.UpdateArticleRequest;
 import site.board.boardtraining.domain.article.dto.business.ArticleDto;
 import site.board.boardtraining.domain.article.dto.business.DeleteArticleDto;
+import site.board.boardtraining.domain.article.dto.business.SearchArticlesDto;
 import site.board.boardtraining.domain.article.service.ArticleService;
 import site.board.boardtraining.domain.auth.data.CustomUserPrincipal;
+import site.board.boardtraining.global.response.success.MultipleSuccessApiResponse;
 import site.board.boardtraining.global.response.success.SingleSuccessApiResponse;
 import site.board.boardtraining.global.response.success.SuccessApiResponse;
 
@@ -19,6 +24,26 @@ public class ArticleController {
 
     public ArticleController(ArticleService articleService) {
         this.articleService = articleService;
+    }
+
+    @GetMapping("/api/boards/{board-id}/articles")
+    public ResponseEntity<MultipleSuccessApiResponse<ArticleDto>> searchArticles(
+            @PathVariable("board-id") Long boardId,
+            @RequestParam(required = false) String searchKeyword,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                MultipleSuccessApiResponse.of(
+                        "성공적으로 게시글이 조회되었습니다.",
+                        articleService.searchArticles(
+                                SearchArticlesDto.of(
+                                        pageable,
+                                        boardId,
+                                        searchKeyword
+                                )
+                        ).getContent()
+                )
+        );
     }
 
     @GetMapping("/api/articles/{article-id}")

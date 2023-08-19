@@ -1,17 +1,13 @@
 package site.board.boardtraining.domain.board.service;
 
-import site.board.boardtraining.domain.board.dto.BoardDto;
-import site.board.boardtraining.domain.board.dto.CreateBoardDto;
-import site.board.boardtraining.domain.board.dto.DeleteBoardDto;
-import site.board.boardtraining.domain.board.dto.UpdateBoardDto;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import site.board.boardtraining.domain.board.dto.business.*;
 
 public interface BoardService {
 
-    BoardDto getBoard(Long boardId);
+    Page<BoardDto> searchBoards(SearchBoardsDto dto);
 
-    List<BoardDto> getAllBoard();
+    BoardDto getBoard(Long boardId);
 
     Long createBoard(CreateBoardDto dto);
 

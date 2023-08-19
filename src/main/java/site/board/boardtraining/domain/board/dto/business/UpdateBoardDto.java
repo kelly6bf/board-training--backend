@@ -1,4 +1,4 @@
-package site.board.boardtraining.domain.board.dto;
+package site.board.boardtraining.domain.board.dto.business;
 
 public record UpdateBoardDto(
         Long boardId,
