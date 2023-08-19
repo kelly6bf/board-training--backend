@@ -31,6 +31,11 @@ public class BoardServiceImpl
     @Transactional(readOnly = true)
     @Override
     public Page<BoardDto> searchBoards(SearchBoardsDto dto) {
+        if (dto.searchKeyword() == null || dto.searchKeyword().isBlank()) {
+            return boardRepository.findAll(dto.pageable())
+                    .map(BoardDto::from);
+        }
+
         return boardRepository.findByTitleContaining(
                         dto.searchKeyword(),
                         dto.pageable()
