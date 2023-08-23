@@ -78,12 +78,12 @@ public class Board
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Board board)) return false;
-        return id != null && Objects.equals(id, board.id);
+        if (!(o instanceof Board that)) return false;
+        return this.getId() != null && Objects.equals(this.getId(), that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(this.getId());
     }
 }
