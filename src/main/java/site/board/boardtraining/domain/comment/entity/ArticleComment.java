@@ -1,10 +1,11 @@
-package site.board.boardtraining.domain.article.entity;
+package site.board.boardtraining.domain.comment.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import site.board.boardtraining.domain.article.constant.ArticleCommentStatus;
+import site.board.boardtraining.domain.comment.constant.ArticleCommentStatus;
+import site.board.boardtraining.domain.article.entity.Article;
 import site.board.boardtraining.global.audit.BaseEntity;
 import site.board.boardtraining.domain.member.entity.Member;
 
