@@ -6,10 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import site.board.boardtraining.domain.comment.constant.ArticleCommentStatus;
 import site.board.boardtraining.domain.article.entity.Article;
+import site.board.boardtraining.domain.comment.constant.ArticleCommentType;
 import site.board.boardtraining.global.audit.BaseEntity;
 import site.board.boardtraining.domain.member.entity.Member;
 
 import java.util.Objects;
+
+import static site.board.boardtraining.domain.comment.constant.ArticleCommentStatus.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -32,7 +35,11 @@ public class ArticleComment
 
     @Enumerated(EnumType.STRING)
     @Column(length = 50, nullable = false)
-    private ArticleCommentStatus status;
+    private ArticleCommentStatus status = ACTIVE;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 50, nullable = false, updatable = false)
+    private ArticleCommentType commentType;
 
     @Column(updatable = false)
     private Long parentCommentId;
@@ -45,13 +52,13 @@ public class ArticleComment
 
     private ArticleComment(
             String content,
-            ArticleCommentStatus status,
+            ArticleCommentType commentType,
             Long parentCommentId,
             Article article,
             Member member
     ) {
         this.content = content;
-        this.status = status;
+        this.commentType = commentType;
         this.parentCommentId = parentCommentId;
         this.article = article;
         this.member = member;
@@ -59,18 +66,24 @@ public class ArticleComment
 
     public static ArticleComment of(
             String content,
-            ArticleCommentStatus status,
+            ArticleCommentType articleCommentType,
             Long parentCommentId,
             Article article,
             Member member
     ) {
         return new ArticleComment(
                 content,
-                status,
+                articleCommentType,
                 parentCommentId,
                 article,
                 member
         );
+    }
+
+    public void update(
+            String content
+    ) {
+        this.content = content;
     }
 
     @Override
