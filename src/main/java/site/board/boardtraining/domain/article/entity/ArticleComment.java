@@ -33,6 +33,9 @@ public class ArticleComment
     @Column(length = 50, nullable = false)
     private ArticleCommentStatus status;
 
+    @Column(updatable = false)
+    private Long parentCommentId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Article article;
 
@@ -42,16 +45,18 @@ public class ArticleComment
     private ArticleComment(
             String content,
             ArticleCommentStatus status,
+            Long parentCommentId,
             Article article,
             Member member
     ) {
         this.content = content;
         this.status = status;
+        this.parentCommentId = parentCommentId;
         this.article = article;
         this.member = member;
     }
 
-    public static ArticleComment of(
+    public static ArticleComment createParentComment(
             String content,
             ArticleCommentStatus status,
             Article article,
@@ -60,6 +65,23 @@ public class ArticleComment
         return new ArticleComment(
                 content,
                 status,
+                null,
+                article,
+                member
+        );
+    }
+
+    public static ArticleComment createChildComment(
+            String content,
+            ArticleCommentStatus status,
+            Long parentCommentId,
+            Article article,
+            Member member
+    ) {
+        return new ArticleComment(
+                content,
+                status,
+                parentCommentId,
                 article,
                 member
         );
