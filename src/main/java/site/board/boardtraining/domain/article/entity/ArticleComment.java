@@ -56,22 +56,7 @@ public class ArticleComment
         this.member = member;
     }
 
-    public static ArticleComment createParentComment(
-            String content,
-            ArticleCommentStatus status,
-            Article article,
-            Member member
-    ) {
-        return new ArticleComment(
-                content,
-                status,
-                null,
-                article,
-                member
-        );
-    }
-
-    public static ArticleComment createChildComment(
+    public static ArticleComment of(
             String content,
             ArticleCommentStatus status,
             Long parentCommentId,
