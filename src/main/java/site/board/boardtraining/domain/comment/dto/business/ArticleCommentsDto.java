@@ -10,11 +10,11 @@ public record ArticleCommentsDto(
         String content,
         String status,
         MemberDto member,
-        List<ArticleComment> childComments
+        List<ArticleCommentDto> childComments
 ) {
     public static ArticleCommentsDto from(
             ArticleComment articleComment,
-            List<ArticleComment> childComments
+            List<ArticleCommentDto> childComments
     ) {
         return new ArticleCommentsDto(
                 articleComment.getId(),
