@@ -6,6 +6,7 @@ import site.board.boardtraining.domain.article.dto.business.CreateArticleDto;
 public record CreateArticleRequest(
         String title,
         String content,
+        String thumbnailImageUrl,
         ArticleStatus status
 ) {
     public CreateArticleDto toDto(
@@ -15,6 +16,7 @@ public record CreateArticleRequest(
         return CreateArticleDto.of(
                 title,
                 content,
+                thumbnailImageUrl,
                 status,
                 boardId,
                 memberId

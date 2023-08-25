@@ -6,6 +6,7 @@ import site.board.boardtraining.domain.article.dto.business.UpdateArticleDto;
 public record UpdateArticleRequest(
         String title,
         String content,
+        String thumbnailImageUrl,
         ArticleStatus status
 ) {
     public UpdateArticleDto toDto(
@@ -16,6 +17,7 @@ public record UpdateArticleRequest(
                 articleId,
                 title,
                 content,
+                thumbnailImageUrl,
                 status,
                 memberId
         );
