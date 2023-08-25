@@ -9,6 +9,7 @@ public record ArticleDto(
         Long articleId,
         String title,
         String content,
+        String thumbnailImageUrl,
         MemberDto member,
         LocalDateTime createdAt
 ) {
@@ -16,6 +17,7 @@ public record ArticleDto(
             Long articleId,
             String title,
             String content,
+            String thumbnailImageUrl,
             MemberDto member,
             LocalDateTime createdAt
     ) {
@@ -23,6 +25,7 @@ public record ArticleDto(
                 articleId,
                 title,
                 content,
+                thumbnailImageUrl,
                 member,
                 createdAt
         );
@@ -33,6 +36,7 @@ public record ArticleDto(
                 article.getId(),
                 article.getTitle(),
                 article.getContent(),
+                article.getThumbnailImageUrl(),
                 MemberDto.from(article.getMember()),
                 article.getCreatedAt()
         );

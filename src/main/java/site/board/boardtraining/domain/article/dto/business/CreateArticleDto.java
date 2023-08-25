@@ -8,6 +8,7 @@ import site.board.boardtraining.domain.member.entity.Member;
 public record CreateArticleDto(
         String title,
         String content,
+        String thumbnailImageUrl,
         ArticleStatus status,
         Long boardId,
         Long memberId
@@ -15,6 +16,7 @@ public record CreateArticleDto(
     public static CreateArticleDto of(
             String title,
             String content,
+            String thumbnailImageUrl,
             ArticleStatus status,
             Long boardId,
             Long memberId
@@ -22,6 +24,7 @@ public record CreateArticleDto(
         return new CreateArticleDto(
                 title,
                 content,
+                thumbnailImageUrl,
                 status,
                 boardId,
                 memberId
@@ -35,6 +38,7 @@ public record CreateArticleDto(
         return Article.of(
                 title,
                 content,
+                thumbnailImageUrl,
                 status,
                 board,
                 member

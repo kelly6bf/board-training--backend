@@ -35,6 +35,9 @@ public class Article
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
+    @Column(length = 1000, nullable = false)
+    private String thumbnailImageUrl;
+
     @Enumerated(EnumType.STRING)
     @Column(length = 50, nullable = false)
     private ArticleStatus status;
@@ -48,12 +51,14 @@ public class Article
     private Article(
             String title,
             String content,
+            String thumbnailImageUrl,
             ArticleStatus status,
             Board board,
             Member member
     ) {
         this.title = title;
         this.content = content;
+        this.thumbnailImageUrl = thumbnailImageUrl;
         this.status = status;
         this.board = board;
         this.member = member;
@@ -62,6 +67,7 @@ public class Article
     public static Article of(
             String title,
             String content,
+            String thumbnailImageUrl,
             ArticleStatus status,
             Board board,
             Member member
@@ -69,6 +75,7 @@ public class Article
         return new Article(
                 title,
                 content,
+                thumbnailImageUrl,
                 status,
                 board,
                 member
@@ -78,10 +85,12 @@ public class Article
     public void update(
             String title,
             String content,
+            String thumbnailImageUrl,
             ArticleStatus status
     ) {
         this.title = title;
         this.content = content;
+        this.thumbnailImageUrl = thumbnailImageUrl;
         this.status = status;
     }
 

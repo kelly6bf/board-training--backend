@@ -77,6 +77,7 @@ public class ArticleServiceImpl
         savedArticle.update(
                 dto.title(),
                 dto.content(),
+                dto.thumbnailImageUrl(),
                 dto.status()
         );
     }

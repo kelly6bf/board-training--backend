@@ -6,6 +6,7 @@ public record UpdateArticleDto(
         Long articleId,
         String title,
         String content,
+        String thumbnailImageUrl,
         ArticleStatus status,
         Long memberId
 ) {
@@ -13,6 +14,7 @@ public record UpdateArticleDto(
             Long articleId,
             String title,
             String content,
+            String thumbnailImageUrl,
             ArticleStatus status,
             Long memberId
     ) {
@@ -20,6 +22,7 @@ public record UpdateArticleDto(
                 articleId,
                 title,
                 content,
+                thumbnailImageUrl,
                 status,
                 memberId
         );
