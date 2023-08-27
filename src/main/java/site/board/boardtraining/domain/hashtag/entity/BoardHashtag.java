@@ -38,4 +38,8 @@ public class BoardHashtag
     ) {
         return new BoardHashtag(hashtag, board);
     }
+
+    public String getHashtag() {
+        return hashtag.getTitle();
+    }
 }

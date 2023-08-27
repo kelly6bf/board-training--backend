@@ -38,4 +38,8 @@ public class ArticleHashtag
     ) {
         return new ArticleHashtag(hashtag, article);
     }
+
+    public String getHashtag() {
+        return hashtag.getTitle();
+    }
 }
