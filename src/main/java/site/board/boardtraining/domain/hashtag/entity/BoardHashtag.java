@@ -1,16 +1,17 @@
-package site.board.boardtraining.domain.article.entity;
+package site.board.boardtraining.domain.hashtag.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import site.board.boardtraining.domain.board.entity.Board;
 import site.board.boardtraining.global.audit.BaseTimeEntity;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "article_hashtag")
+@Table(name = "board_hashtag")
 @Entity
-public class ArticleHashtag
+public class BoardHashtag
         extends BaseTimeEntity {
 
     @Id
@@ -21,20 +22,24 @@ public class ArticleHashtag
     private Hashtag hashtag;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Article article;
+    private Board board;
 
-    private ArticleHashtag(
+    private BoardHashtag(
             Hashtag hashtag,
-            Article article
+            Board board
     ) {
         this.hashtag = hashtag;
-        this.article = article;
+        this.board = board;
     }
 
-    public static ArticleHashtag of(
+    public static BoardHashtag of(
             Hashtag hashtag,
-            Article article
+            Board board
     ) {
-        return new ArticleHashtag(hashtag, article);
+        return new BoardHashtag(hashtag, board);
+    }
+
+    public String getHashtag() {
+        return hashtag.getTitle();
     }
 }

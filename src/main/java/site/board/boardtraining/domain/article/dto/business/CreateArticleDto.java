@@ -5,10 +5,13 @@ import site.board.boardtraining.domain.article.entity.Article;
 import site.board.boardtraining.domain.board.entity.Board;
 import site.board.boardtraining.domain.member.entity.Member;
 
+import java.util.Set;
+
 public record CreateArticleDto(
         String title,
         String content,
         String thumbnailImageUrl,
+        Set<String> hashtags,
         ArticleStatus status,
         Long boardId,
         Long memberId
@@ -17,6 +20,7 @@ public record CreateArticleDto(
             String title,
             String content,
             String thumbnailImageUrl,
+            Set<String> hashtags,
             ArticleStatus status,
             Long boardId,
             Long memberId
@@ -25,6 +29,7 @@ public record CreateArticleDto(
                 title,
                 content,
                 thumbnailImageUrl,
+                hashtags,
                 status,
                 boardId,
                 memberId

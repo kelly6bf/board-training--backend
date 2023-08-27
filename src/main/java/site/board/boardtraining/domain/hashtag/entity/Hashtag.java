@@ -1,4 +1,4 @@
-package site.board.boardtraining.domain.article.entity;
+package site.board.boardtraining.domain.hashtag.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
