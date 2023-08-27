@@ -111,7 +111,6 @@ public class HashtagServiceImpl
     }
 
     public Hashtag createHashtag(String hashtagTitle) {
-        System.out.println("hashtagTitle = " + hashtagTitle);
         return hashtagRepository.save(
                 Hashtag.of(hashtagTitle)
         );
