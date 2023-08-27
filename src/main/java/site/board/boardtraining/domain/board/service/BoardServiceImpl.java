@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import site.board.boardtraining.domain.board.dto.business.*;
 import site.board.boardtraining.domain.board.entity.Board;
 import site.board.boardtraining.domain.board.repository.BoardRepository;
+import site.board.boardtraining.domain.hashtag.service.HashtagService;
 import site.board.boardtraining.domain.member.repository.MemberRepository;
 import site.board.boardtraining.global.exception.ResourceNotFoundException;
 import site.board.boardtraining.global.exception.UnauthorizedResourceAccessException;
@@ -19,13 +20,16 @@ public class BoardServiceImpl
 
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
+    private final HashtagService hashtagService;
 
     public BoardServiceImpl(
             BoardRepository boardRepository,
-            MemberRepository memberRepository
+            MemberRepository memberRepository,
+            HashtagService hashtagService
     ) {
         this.boardRepository = boardRepository;
         this.memberRepository = memberRepository;
+        this.hashtagService = hashtagService;
     }
 
     @Transactional(readOnly = true)
@@ -33,21 +37,34 @@ public class BoardServiceImpl
     public Page<BoardDto> searchBoards(SearchBoardsDto dto) {
         if (dto.searchKeyword() == null || dto.searchKeyword().isBlank()) {
             return boardRepository.findAll(dto.pageable())
-                    .map(BoardDto::from);
+                    .map(board ->
+                            BoardDto.from(
+                                    board,
+                                    hashtagService.getAllBoardHashtags(board)
+                            )
+                    );
         }
 
         return boardRepository.findByTitleContaining(
                         dto.searchKeyword(),
                         dto.pageable()
                 )
-                .map(BoardDto::from);
+                .map(board ->
+                        BoardDto.from(
+                                board,
+                                hashtagService.getAllBoardHashtags(board)
+                        )
+                );
     }
 
     @Transactional(readOnly = true)
     @Override
     public BoardDto getBoard(Long boardId) {
         return boardRepository.findById(boardId)
-                .map(BoardDto::from)
+                .map(board -> BoardDto.from(
+                        board,
+                        hashtagService.getAllBoardHashtags(board))
+                )
                 .orElseThrow(() -> new ResourceNotFoundException(BOARD_NOT_FOUND));
     }
 
@@ -58,6 +75,12 @@ public class BoardServiceImpl
                         memberRepository.getReferenceById(dto.memberId())
                 )
         );
+
+        hashtagService.addBoardHashtags(
+                dto.hashtags(),
+                createdBoard
+        );
+
         return createdBoard.getId();
     }
 
@@ -75,6 +98,11 @@ public class BoardServiceImpl
                 dto.description(),
                 dto.thumbnailImageUrl()
         );
+
+        hashtagService.updateBoardHashtags(
+                dto.hashtags(),
+                savedBoard
+        );
     }
 
     @Override
@@ -85,6 +113,8 @@ public class BoardServiceImpl
                 savedBoard,
                 dto.memberId()
         );
+
+        hashtagService.deleteBoardHashtags(savedBoard);
 
         boardRepository.delete(savedBoard);
     }

@@ -2,10 +2,13 @@ package site.board.boardtraining.domain.board.dto.api;
 
 import site.board.boardtraining.domain.board.dto.business.UpdateBoardDto;
 
+import java.util.Set;
+
 public record UpdateBoardRequest(
         String title,
         String description,
-        String thumbnailImageUrl
+        String thumbnailImageUrl,
+        Set<String> hashtags
 ) {
     public UpdateBoardDto toDto(
             Long boardId,
@@ -16,6 +19,7 @@ public record UpdateBoardRequest(
                 title,
                 description,
                 thumbnailImageUrl,
+                hashtags,
                 memberId
         );
     }

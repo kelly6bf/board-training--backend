@@ -2,10 +2,13 @@ package site.board.boardtraining.domain.board.dto.api;
 
 import site.board.boardtraining.domain.board.dto.business.CreateBoardDto;
 
+import java.util.Set;
+
 public record CreateBoardRequest(
         String title,
         String description,
-        String thumbnailImageUrl
+        String thumbnailImageUrl,
+        Set<String> hashtags
 ) {
     public CreateBoardDto toDto(
             Long memberId
@@ -14,6 +17,7 @@ public record CreateBoardRequest(
                 title,
                 description,
                 thumbnailImageUrl,
+                hashtags,
                 memberId
         );
     }
