@@ -1,9 +1,10 @@
-package site.board.boardtraining.domain.article.entity;
+package site.board.boardtraining.domain.hashtag.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import site.board.boardtraining.domain.article.entity.Article;
 import site.board.boardtraining.global.audit.BaseTimeEntity;
 
 @Getter
