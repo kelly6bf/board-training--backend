@@ -4,20 +4,20 @@ import site.board.boardtraining.domain.board.entity.Board;
 import site.board.boardtraining.domain.member.dto.business.MemberDto;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.LinkedHashSet;
 
 public record BoardDto(
         Long boardId,
         String title,
         String description,
         String thumbnailImageUrl,
-        Set<String> hashtags,
+        LinkedHashSet<String> hashtags,
         MemberDto memberDto,
         LocalDateTime createAt
 ) {
     public static BoardDto from(
             Board board,
-            Set<String> hashtags
+            LinkedHashSet<String> hashtags
     ) {
         return new BoardDto(
                 board.getId(),

@@ -2,13 +2,13 @@ package site.board.boardtraining.domain.board.dto.api;
 
 import site.board.boardtraining.domain.board.dto.business.UpdateBoardDto;
 
-import java.util.Set;
+import java.util.LinkedHashSet;
 
 public record UpdateBoardRequest(
         String title,
         String description,
         String thumbnailImageUrl,
-        Set<String> hashtags
+        LinkedHashSet<String> hashtags
 ) {
     public UpdateBoardDto toDto(
             Long boardId,

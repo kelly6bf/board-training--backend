@@ -11,7 +11,7 @@ import site.board.boardtraining.domain.hashtag.repository.ArticleHashtagReposito
 import site.board.boardtraining.domain.hashtag.repository.BoardHashtagRepository;
 import site.board.boardtraining.domain.hashtag.repository.HashtagRepository;
 
-import java.util.Set;
+import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -35,16 +35,16 @@ public class HashtagServiceImpl
 
     @Transactional(readOnly = true)
     @Override
-    public Set<String> getAllBoardHashtags(Board board) {
+    public LinkedHashSet<String> getAllBoardHashtags(Board board) {
         return boardHashtagRepository.findAllByBoard(board)
                 .stream()
                 .map(BoardHashtag::getHashtag)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection( LinkedHashSet::new ));
     }
 
     @Transactional(readOnly = true)
     @Override
-    public void addBoardHashtags(Set<String> boardHashtags, Board board) {
+    public void addBoardHashtags(LinkedHashSet<String> boardHashtags, Board board) {
         boardHashtags
                 .forEach(
                         hashtag -> {
@@ -62,7 +62,7 @@ public class HashtagServiceImpl
     }
 
     @Override
-    public void updateBoardHashtags(Set<String> boardHashtags, Board board) {
+    public void updateBoardHashtags(LinkedHashSet<String> boardHashtags, Board board) {
         deleteBoardHashtags(board);
         addBoardHashtags(boardHashtags, board);
     }
@@ -74,15 +74,15 @@ public class HashtagServiceImpl
 
     @Transactional(readOnly = true)
     @Override
-    public Set<String> getAllArticleHashtags(Article article) {
+    public LinkedHashSet<String> getAllArticleHashtags(Article article) {
         return articleHashtagRepository.findAllByArticle(article)
                 .stream()
                 .map(ArticleHashtag::getHashtag)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection( LinkedHashSet::new ));
     }
 
     @Override
-    public void addArticleHashtags(Set<String> articleHashtags, Article article) {
+    public void addArticleHashtags(LinkedHashSet<String> articleHashtags, Article article) {
         articleHashtags
                 .forEach(
                         hashtag -> {
@@ -100,7 +100,7 @@ public class HashtagServiceImpl
     }
 
     @Override
-    public void updateArticleHashtags(Set<String> articleHashtags, Article article) {
+    public void updateArticleHashtags(LinkedHashSet<String> articleHashtags, Article article) {
         deleteArticleHashtags(article);
         addArticleHashtags(articleHashtags, article);
     }
