@@ -42,19 +42,23 @@ public class HashtagServiceImpl
                 .collect(Collectors.toSet());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public void addBoardHashtags(Set<String> boardHashtags, Board board) {
         boardHashtags
-                .stream()
-                .map(hashtag -> hashtagRepository.findByTitle(hashtag)
-                        .orElse(createHashtag(hashtag))
-                )
-                .map(hashtag -> boardHashtagRepository.save(
-                        BoardHashtag.of(
-                                hashtag,
-                                board
-                        )
-                ));
+                .forEach(
+                        hashtag -> {
+                            Hashtag hashtagEntity = hashtagRepository.findByTitle(hashtag)
+                                    .orElseGet(() -> createHashtag(hashtag));
+
+                            boardHashtagRepository.save(
+                                    BoardHashtag.of(
+                                            hashtagEntity,
+                                            board
+                                    )
+                            );
+                        }
+                );
     }
 
     @Override
@@ -80,16 +84,19 @@ public class HashtagServiceImpl
     @Override
     public void addArticleHashtags(Set<String> articleHashtags, Article article) {
         articleHashtags
-                .stream()
-                .map(hashtag -> hashtagRepository.findByTitle(hashtag)
-                        .orElse(createHashtag(hashtag))
-                )
-                .map(hashtag -> articleHashtagRepository.save(
-                        ArticleHashtag.of(
-                                hashtag,
-                                article
-                        )
-                ));
+                .forEach(
+                        hashtag -> {
+                            Hashtag hashtagEntity = hashtagRepository.findByTitle(hashtag)
+                                    .orElseGet(() -> createHashtag(hashtag));
+
+                            articleHashtagRepository.save(
+                                    ArticleHashtag.of(
+                                            hashtagEntity,
+                                            article
+                                    )
+                            );
+                        }
+                );
     }
 
     @Override
@@ -104,6 +111,7 @@ public class HashtagServiceImpl
     }
 
     public Hashtag createHashtag(String hashtagTitle) {
+        System.out.println("hashtagTitle = " + hashtagTitle);
         return hashtagRepository.save(
                 Hashtag.of(hashtagTitle)
         );
