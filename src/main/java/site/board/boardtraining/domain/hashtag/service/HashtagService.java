@@ -3,18 +3,22 @@ package site.board.boardtraining.domain.hashtag.service;
 import site.board.boardtraining.domain.article.entity.Article;
 import site.board.boardtraining.domain.board.entity.Board;
 
-import java.util.List;
+import java.util.Set;
 
 public interface HashtagService {
-    List<String> getAllBoardHashtags(Board board);
+    Set<String> getAllBoardHashtags(Board board);
 
-    void addBoardHashtags(List<String> boardHashtags, Board boardId);
+    void addBoardHashtags(Set<String> boardHashtags, Board board);
+
+    void updateBoardHashtags(Set<String> boardHashtags, Board board);
 
     void deleteBoardHashtags(Board board);
 
-    List<String> getAllArticleHashtags(Article article);
+    Set<String> getAllArticleHashtags(Article article);
 
-    void addArticleHashtags(List<String> articleHashtags, Article articleId);
+    void addArticleHashtags(Set<String> articleHashtags, Article article);
+
+    void updateArticleHashtags(Set<String> articleHashtags, Article article);
 
     void deleteArticleHashtags(Article article);
 }
