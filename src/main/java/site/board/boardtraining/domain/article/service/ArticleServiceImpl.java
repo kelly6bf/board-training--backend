@@ -7,6 +7,7 @@ import site.board.boardtraining.domain.article.dto.business.*;
 import site.board.boardtraining.domain.article.entity.Article;
 import site.board.boardtraining.domain.article.repository.ArticleRepository;
 import site.board.boardtraining.domain.board.repository.BoardRepository;
+import site.board.boardtraining.domain.hashtag.service.HashtagService;
 import site.board.boardtraining.domain.member.repository.MemberRepository;
 import site.board.boardtraining.global.exception.ResourceNotFoundException;
 import site.board.boardtraining.global.exception.UnauthorizedResourceAccessException;
@@ -20,15 +21,18 @@ public class ArticleServiceImpl
     private final ArticleRepository articleRepository;
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
+    private final HashtagService hashtagService;
 
     public ArticleServiceImpl(
             ArticleRepository articleRepository,
             BoardRepository boardRepository,
-            MemberRepository memberRepository
+            MemberRepository memberRepository,
+            HashtagService hashtagService
     ) {
         this.articleRepository = articleRepository;
         this.boardRepository = boardRepository;
         this.memberRepository = memberRepository;
+        this.hashtagService = hashtagService;
     }
 
     @Transactional(readOnly = true)
@@ -36,7 +40,12 @@ public class ArticleServiceImpl
     public Page<ArticleDto> searchArticles(SearchArticlesDto dto) {
         if (dto.searchKeyword() == null || dto.searchKeyword().isBlank()) {
             return articleRepository.findAll(dto.pageable())
-                    .map(ArticleDto::from);
+                    .map(article ->
+                            ArticleDto.from(
+                                    article,
+                                    hashtagService.getAllArticleHashtags(article)
+                            )
+                    );
         }
 
         return articleRepository.findByBoard_IdAndTitleContainingOrContentContaining(
@@ -45,14 +54,24 @@ public class ArticleServiceImpl
                         dto.searchKeyword(),
                         dto.pageable()
                 )
-                .map(ArticleDto::from);
+                .map(article ->
+                        ArticleDto.from(
+                                article,
+                                hashtagService.getAllArticleHashtags(article)
+                        )
+                );
     }
 
     @Transactional(readOnly = true)
     @Override
     public ArticleDto getArticle(Long articleId) {
         return articleRepository.findById(articleId)
-                .map(ArticleDto::from)
+                .map(article ->
+                        ArticleDto.from(
+                                article,
+                                hashtagService.getAllArticleHashtags(article)
+                        )
+                )
                 .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_NOT_FOUND));
     }
 
@@ -63,6 +82,11 @@ public class ArticleServiceImpl
                         boardRepository.getReferenceById(dto.boardId()),
                         memberRepository.getReferenceById(dto.memberId())
                 )
+        );
+
+        hashtagService.addArticleHashtags(
+                dto.hashtags(),
+                createdArticle
         );
 
         return createdArticle.getId();
@@ -80,6 +104,11 @@ public class ArticleServiceImpl
                 dto.thumbnailImageUrl(),
                 dto.status()
         );
+
+        hashtagService.updateArticleHashtags(
+                dto.hashtags(),
+                savedArticle
+        );
     }
 
     @Override
@@ -87,6 +116,8 @@ public class ArticleServiceImpl
         Article savedArticle = articleRepository.getReferenceById(dto.articleId());
 
         verifyArticleOwner(savedArticle, dto.memberId());
+
+        hashtagService.deleteArticleHashtags(savedArticle);
 
         articleRepository.delete(savedArticle);
     }
