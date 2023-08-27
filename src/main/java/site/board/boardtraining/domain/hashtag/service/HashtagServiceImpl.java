@@ -11,7 +11,8 @@ import site.board.boardtraining.domain.hashtag.repository.ArticleHashtagReposito
 import site.board.boardtraining.domain.hashtag.repository.BoardHashtagRepository;
 import site.board.boardtraining.domain.hashtag.repository.HashtagRepository;
 
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -22,17 +23,27 @@ public class HashtagServiceImpl
     private final BoardHashtagRepository boardHashtagRepository;
     private final ArticleHashtagRepository articleHashtagRepository;
 
+    public HashtagServiceImpl(
+            HashtagRepository hashtagRepository,
+            BoardHashtagRepository boardHashtagRepository,
+            ArticleHashtagRepository articleHashtagRepository
+    ) {
+        this.hashtagRepository = hashtagRepository;
+        this.boardHashtagRepository = boardHashtagRepository;
+        this.articleHashtagRepository = articleHashtagRepository;
+    }
+
     @Transactional(readOnly = true)
     @Override
-    public List<String> getAllBoardHashtags(Board board) {
+    public Set<String> getAllBoardHashtags(Board board) {
         return boardHashtagRepository.findAllByBoard(board)
                 .stream()
                 .map(BoardHashtag::getHashtag)
-                .toList();
+                .collect(Collectors.toSet());
     }
 
     @Override
-    public void addBoardHashtags(List<String> boardHashtags, Board board) {
+    public void addBoardHashtags(Set<String> boardHashtags, Board board) {
         boardHashtags
                 .stream()
                 .map(hashtag -> hashtagRepository.findByTitle(hashtag)
@@ -47,21 +58,27 @@ public class HashtagServiceImpl
     }
 
     @Override
+    public void updateBoardHashtags(Set<String> boardHashtags, Board board) {
+        deleteBoardHashtags(board);
+        addBoardHashtags(boardHashtags, board);
+    }
+
+    @Override
     public void deleteBoardHashtags(Board board) {
         boardHashtagRepository.deleteAllByBoard(board);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<String> getAllArticleHashtags(Article article) {
+    public Set<String> getAllArticleHashtags(Article article) {
         return articleHashtagRepository.findAllByArticle(article)
                 .stream()
                 .map(ArticleHashtag::getHashtag)
-                .toList();
+                .collect(Collectors.toSet());
     }
 
     @Override
-    public void addArticleHashtags(List<String> articleHashtags, Article article) {
+    public void addArticleHashtags(Set<String> articleHashtags, Article article) {
         articleHashtags
                 .stream()
                 .map(hashtag -> hashtagRepository.findByTitle(hashtag)
@@ -76,6 +93,12 @@ public class HashtagServiceImpl
     }
 
     @Override
+    public void updateArticleHashtags(Set<String> articleHashtags, Article article) {
+        deleteArticleHashtags(article);
+        addArticleHashtags(articleHashtags, article);
+    }
+
+    @Override
     public void deleteArticleHashtags(Article article) {
         articleHashtagRepository.deleteAllByArticle(article);
     }
@@ -84,15 +107,5 @@ public class HashtagServiceImpl
         return hashtagRepository.save(
                 Hashtag.of(hashtagTitle)
         );
-    }
-
-    public HashtagServiceImpl(
-            HashtagRepository hashtagRepository,
-            BoardHashtagRepository boardHashtagRepository,
-            ArticleHashtagRepository articleHashtagRepository
-    ) {
-        this.hashtagRepository = hashtagRepository;
-        this.boardHashtagRepository = boardHashtagRepository;
-        this.articleHashtagRepository = articleHashtagRepository;
     }
 }
