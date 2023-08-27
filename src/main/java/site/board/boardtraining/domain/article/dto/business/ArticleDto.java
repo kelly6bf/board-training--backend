@@ -4,14 +4,14 @@ import site.board.boardtraining.domain.article.entity.Article;
 import site.board.boardtraining.domain.member.dto.business.MemberDto;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.LinkedHashSet;
 
 public record ArticleDto(
         Long articleId,
         String title,
         String content,
         String thumbnailImageUrl,
-        Set<String> hashtags,
+        LinkedHashSet<String> hashtags,
         MemberDto member,
         LocalDateTime createdAt
 ) {
@@ -20,7 +20,7 @@ public record ArticleDto(
             String title,
             String content,
             String thumbnailImageUrl,
-            Set<String> hashtags,
+            LinkedHashSet<String> hashtags,
             MemberDto member,
             LocalDateTime createdAt
     ) {
@@ -37,7 +37,7 @@ public record ArticleDto(
 
     public static ArticleDto from(
             Article article,
-            Set<String> hashtags
+            LinkedHashSet<String> hashtags
     ) {
         return new ArticleDto(
                 article.getId(),

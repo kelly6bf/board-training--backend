@@ -2,14 +2,14 @@ package site.board.boardtraining.domain.article.dto.business;
 
 import site.board.boardtraining.domain.article.constant.ArticleStatus;
 
-import java.util.Set;
+import java.util.LinkedHashSet;
 
 public record UpdateArticleDto(
         Long articleId,
         String title,
         String content,
         String thumbnailImageUrl,
-        Set<String> hashtags,
+        LinkedHashSet<String> hashtags,
         ArticleStatus status,
         Long memberId
 ) {
@@ -18,7 +18,7 @@ public record UpdateArticleDto(
             String title,
             String content,
             String thumbnailImageUrl,
-            Set<String> hashtags,
+            LinkedHashSet<String> hashtags,
             ArticleStatus status,
             Long memberId
     ) {

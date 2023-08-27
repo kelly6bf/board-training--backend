@@ -1,13 +1,13 @@
 package site.board.boardtraining.domain.board.dto.business;
 
-import java.util.Set;
+import java.util.LinkedHashSet;
 
 public record UpdateBoardDto(
         Long boardId,
         String title,
         String description,
         String thumbnailImageUrl,
-        Set<String> hashtags,
+        LinkedHashSet<String> hashtags,
         Long memberId
 ) {
     public static UpdateBoardDto of(
@@ -15,7 +15,7 @@ public record UpdateBoardDto(
             String title,
             String description,
             String thumbnailImageUrl,
-            Set<String> hashtags,
+            LinkedHashSet<String> hashtags,
             Long memberId
     ) {
         return new UpdateBoardDto(
