@@ -14,6 +14,7 @@ import site.board.boardtraining.domain.board.dto.business.BoardDto;
 import site.board.boardtraining.domain.board.dto.business.DeleteBoardDto;
 import site.board.boardtraining.domain.board.dto.business.SearchBoardsDto;
 import site.board.boardtraining.domain.board.service.BoardService;
+import site.board.boardtraining.domain.board.service.BoardReactionService;
 import site.board.boardtraining.global.response.success.MultipleSuccessApiResponse;
 import site.board.boardtraining.global.response.success.SingleSuccessApiResponse;
 import site.board.boardtraining.global.response.success.SuccessApiResponse;
@@ -23,9 +24,14 @@ import site.board.boardtraining.global.response.success.SuccessApiResponse;
 public class BoardController {
 
     private final BoardService boardService;
+    private final BoardReactionService boardReactionService;
 
-    public BoardController(BoardService boardService) {
+    public BoardController(
+            BoardService boardService,
+            BoardReactionService boardReactionService
+    ) {
         this.boardService = boardService;
+        this.boardReactionService = boardReactionService;
     }
 
     @GetMapping
@@ -110,6 +116,58 @@ public class BoardController {
         return ResponseEntity.ok(
                 SuccessApiResponse.of(
                         "성공적으로 게시판이 삭제되었습니다."
+                )
+        );
+    }
+
+    @PostMapping("/{board-id}/like")
+    public ResponseEntity<SuccessApiResponse> addBoardLike(
+            @PathVariable("board-id") Long boardId,
+            @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+        boardReactionService.addBoardLike(boardId, principal.getMemberId());
+        return ResponseEntity.ok(
+                SuccessApiResponse.of(
+                        "성공적으로 게시판 좋아요가 등록되었습니다."
+                )
+        );
+    }
+
+    @DeleteMapping("/{board-id}/like")
+    public ResponseEntity<SuccessApiResponse> deleteBoardLike(
+            @PathVariable("board-id") Long boardId,
+            @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+        boardReactionService.deleteBoardLike(boardId, principal.getMemberId());
+        return ResponseEntity.ok(
+                SuccessApiResponse.of(
+                        "성공적으로 게시판 좋아요가 삭제되었습니다."
+                )
+        );
+    }
+
+    @PostMapping("/{board-id}/dislike")
+    public ResponseEntity<SuccessApiResponse> addBoardDislike(
+            @PathVariable("board-id") Long boardId,
+            @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+        boardReactionService.addBoardDislike(boardId, principal.getMemberId());
+        return ResponseEntity.ok(
+                SuccessApiResponse.of(
+                        "성공적으로 게시판 싫어요가 등록되었습니다."
+                )
+        );
+    }
+
+    @DeleteMapping("/{board-id}/dislike")
+    public ResponseEntity<SuccessApiResponse> deleteBoardDislike(
+            @PathVariable("board-id") Long boardId,
+            @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+        boardReactionService.deleteBoardDislike(boardId, principal.getMemberId());
+        return ResponseEntity.ok(
+                SuccessApiResponse.of(
+                        "성공적으로 게시판 싫어요가 삭제되었습니다."
                 )
         );
     }

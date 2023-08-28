@@ -6,12 +6,14 @@ import site.board.boardtraining.domain.board.entity.Board;
 import site.board.boardtraining.domain.board.entity.BoardReaction;
 import site.board.boardtraining.domain.member.entity.Member;
 
+import java.util.Optional;
+
 public interface BoardReactionRepository
         extends JpaRepository<BoardReaction, Long> {
 
     int countAllByTypeAndBoard(BoardReactionType type, Board board);
 
-    void deleteAllByBoardAndMember(Board board, Member member);
-
     boolean existsByTypeAndBoardAndMember(BoardReactionType type, Board board, Member member);
+
+    Optional<BoardReaction> findByBoardAndMember(Board board, Member member);
 }

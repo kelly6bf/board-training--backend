@@ -7,20 +7,36 @@ import site.board.boardtraining.domain.board.entity.Board;
 import site.board.boardtraining.domain.board.entity.BoardReaction;
 import site.board.boardtraining.domain.board.exception.BoardBusinessException;
 import site.board.boardtraining.domain.board.repository.BoardReactionRepository;
+import site.board.boardtraining.domain.board.repository.BoardRepository;
+import site.board.boardtraining.domain.member.entity.Member;
+import site.board.boardtraining.domain.member.repository.MemberRepository;
+import site.board.boardtraining.global.exception.ResourceNotFoundException;
+import site.board.boardtraining.global.exception.UnauthorizedResourceAccessException;
+
+import java.util.Objects;
 
 import static site.board.boardtraining.domain.board.constant.BoardReactionType.DISLIKE;
 import static site.board.boardtraining.domain.board.constant.BoardReactionType.LIKE;
 import static site.board.boardtraining.domain.board.exception.BoardErrorCode.*;
+import static site.board.boardtraining.domain.member.exception.MemberErrorCode.MEMBER_NOT_FOUND;
 
 @Transactional
 @Service
 public class BoardReactionServiceImpl
         implements BoardReactionService {
 
+    private final BoardRepository boardRepository;
     private final BoardReactionRepository boardReactionRepository;
+    private final MemberRepository memberRepository;
 
-    public BoardReactionServiceImpl(BoardReactionRepository boardReactionRepository) {
+    public BoardReactionServiceImpl(
+            BoardRepository boardRepository,
+            BoardReactionRepository boardReactionRepository,
+            MemberRepository memberRepository
+    ) {
+        this.boardRepository = boardRepository;
         this.boardReactionRepository = boardReactionRepository;
+        this.memberRepository = memberRepository;
     }
 
     @Transactional(readOnly = true)
@@ -33,7 +49,9 @@ public class BoardReactionServiceImpl
     }
 
     @Override
-    public void addBoardLike(Board board) {
+    public void addBoardLike(Long boardId, Long memberId) {
+
+        Board board = getBoardEntity(boardId);
 
         if (checkReactionExistence(LIKE, board))
             throw new BoardBusinessException(BOARD_LIKE_REACTION_ALREADY_EXIST);
@@ -42,21 +60,23 @@ public class BoardReactionServiceImpl
                 BoardReaction.of(
                         LIKE,
                         board,
-                        board.getMember()
+                        getMemberEntity(memberId)
                 )
         );
     }
 
     @Override
-    public void deleteBoardLike(Board board) {
+    public void deleteBoardLike(Long boardId, Long memberId) {
 
-        if (!checkReactionExistence(LIKE, board))
-            throw new BoardBusinessException(BOARD_LIKE_REACTION_NOT_FOUND);
+        Board board = getBoardEntity(boardId);
+        Member member = getMemberEntity(memberId);
 
-        boardReactionRepository.deleteAllByBoardAndMember(
-                board,
-                board.getMember()
-        );
+        BoardReaction boardReaction = boardReactionRepository.findByBoardAndMember(board, member)
+                .orElseThrow(() -> new ResourceNotFoundException(BOARD_LIKE_REACTION_NOT_FOUND));
+
+        verifyReactionOwner(boardReaction, member);
+
+        boardReactionRepository.delete(boardReaction);
     }
 
     @Transactional(readOnly = true)
@@ -69,7 +89,10 @@ public class BoardReactionServiceImpl
     }
 
     @Override
-    public void addBoardDislike(Board board) {
+    public void addBoardDislike(Long boardId, Long memberId) {
+
+        Board board = getBoardEntity(boardId);
+
         if (checkReactionExistence(DISLIKE, board))
             throw new BoardBusinessException(BOARD_DISLIKE_REACTION_ALREADY_EXIST);
 
@@ -77,20 +100,23 @@ public class BoardReactionServiceImpl
                 BoardReaction.of(
                         DISLIKE,
                         board,
-                        board.getMember()
+                        getMemberEntity(memberId)
                 )
         );
     }
 
     @Override
-    public void deleteBoardDislike(Board board) {
-        if (!checkReactionExistence(DISLIKE, board))
-            throw new BoardBusinessException(BOARD_DISLIKE_REACTION_NOT_FOUND);
+    public void deleteBoardDislike(Long boardId, Long memberId) {
 
-        boardReactionRepository.deleteAllByBoardAndMember(
-                board,
-                board.getMember()
-        );
+        Board board = getBoardEntity(boardId);
+        Member member = getMemberEntity(memberId);
+
+        BoardReaction boardReaction = boardReactionRepository.findByBoardAndMember(board, member)
+                .orElseThrow(() -> new ResourceNotFoundException(BOARD_DISLIKE_REACTION_NOT_FOUND));
+
+        verifyReactionOwner(boardReaction, member);
+
+        boardReactionRepository.delete(boardReaction);
     }
 
     private boolean checkReactionExistence(
@@ -102,5 +128,22 @@ public class BoardReactionServiceImpl
                 board,
                 board.getMember()
         );
+    }
+
+    private void verifyReactionOwner(BoardReaction reaction, Member member) {
+        if (!Objects.equals(reaction.getMember(), member))
+            throw new UnauthorizedResourceAccessException();
+    }
+
+    @Transactional(readOnly = true)
+    public Board getBoardEntity(Long boardId) {
+        return boardRepository.findById(boardId)
+                .orElseThrow(() -> new ResourceNotFoundException(BOARD_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
+    public Member getMemberEntity(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new ResourceNotFoundException(MEMBER_NOT_FOUND));
     }
 }

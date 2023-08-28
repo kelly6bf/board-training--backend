@@ -6,13 +6,13 @@ public interface BoardReactionService {
 
     int getBoardLikeCount(Board board);
 
-    void addBoardLike(Board board);
+    void addBoardLike(Long boardId, Long memberId);
 
-    void deleteBoardLike(Board board);
+    void deleteBoardLike(Long boardId, Long memberId);
 
     int getBoardDislikeCount(Board board);
 
-    void addBoardDislike(Board board);
+    void addBoardDislike(Long boardId, Long memberId);
 
-    void deleteBoardDislike(Board board);
+    void deleteBoardDislike(Long boardId, Long memberId);
 }
