@@ -22,15 +22,18 @@ public class ArticleCommentServiceImpl
     private final MemberRepository memberRepository;
     private final ArticleRepository articleRepository;
     private final ArticleCommentRepository articleCommentRepository;
+    private final ArticleCommentReactionService articleCommentReactionService;
 
     public ArticleCommentServiceImpl(
             MemberRepository memberRepository,
             ArticleRepository articleRepository,
-            ArticleCommentRepository articleCommentRepository
+            ArticleCommentRepository articleCommentRepository,
+            ArticleCommentReactionService articleCommentReactionService
     ) {
         this.memberRepository = memberRepository;
         this.articleRepository = articleRepository;
         this.articleCommentRepository = articleCommentRepository;
+        this.articleCommentReactionService = articleCommentReactionService;
     }
 
     @Transactional(readOnly = true)
@@ -40,12 +43,20 @@ public class ArticleCommentServiceImpl
     ) {
         return articleCommentRepository.findAllByArticle_IdAndCommentType(articleId, PARENT)
                 .stream()
-                .map(comment -> ArticleCommentsDto.from(
-                        comment,
-                        articleCommentRepository.findAllByParentCommentId(comment.getId())
+                .map(parentComment -> ArticleCommentsDto.from(
+                        parentComment,
+                        articleCommentRepository.findAllByParentCommentId(parentComment.getId())
                                 .stream()
-                                .map(ArticleCommentDto::from)
-                                .collect(Collectors.toList())
+                                .map(childComment ->
+                                        ArticleCommentDto.from(
+                                                childComment,
+                                                articleCommentReactionService.getArticleCommentLikeCount(childComment),
+                                                articleCommentReactionService.getArticleCommentDislikeCount(childComment)
+                                        )
+                                )
+                                .collect(Collectors.toList()),
+                        articleCommentReactionService.getArticleCommentLikeCount(parentComment),
+                        articleCommentReactionService.getArticleCommentDislikeCount(parentComment)
                 ))
                 .collect(Collectors.toList());
     }

@@ -6,13 +6,21 @@ import site.board.boardtraining.domain.member.dto.business.MemberDto;
 public record ArticleCommentDto(
         Long commentId,
         String content,
+        Integer likeCount,
+        Integer dislikeCount,
         String status,
         MemberDto member
 ) {
-    public static ArticleCommentDto from(ArticleComment articleComment) {
+    public static ArticleCommentDto from(
+            ArticleComment articleComment,
+            Integer likeCount,
+            Integer dislikeCount
+    ) {
         return new ArticleCommentDto(
                 articleComment.getId(),
                 articleComment.getContent(),
+                likeCount,
+                dislikeCount,
                 articleComment.getStatus().name(),
                 MemberDto.from(articleComment.getMember())
         );
