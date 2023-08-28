@@ -13,7 +13,7 @@ public interface ArticleReactionRepository
 
     int countAllByTypeAndArticle(ArticleReactionType type, Article article);
 
-    boolean existsByTypeAndArticleAndMember(ArticleReactionType type, Article article, Member member);
+    boolean existsByArticleAndMember(Article article, Member member);
 
     Optional<ArticleReaction> findByArticleAndMember(Article article, Member member);
 }

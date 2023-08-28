@@ -2,7 +2,6 @@ package site.board.boardtraining.domain.board.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import site.board.boardtraining.domain.board.constant.BoardReactionType;
 import site.board.boardtraining.domain.board.entity.Board;
 import site.board.boardtraining.domain.board.entity.BoardReaction;
 import site.board.boardtraining.domain.board.exception.BoardBusinessException;
@@ -52,9 +51,10 @@ public class BoardReactionServiceImpl
     public void addBoardLike(Long boardId, Long memberId) {
 
         Board board = getBoardEntity(boardId);
+        Member member = getMemberEntity(memberId);
 
-        if (checkReactionExistence(LIKE, board))
-            throw new BoardBusinessException(BOARD_LIKE_REACTION_ALREADY_EXIST);
+        if (checkReactionExistence(board, member))
+            throw new BoardBusinessException(BOARD_REACTION_ALREADY_EXIST);
 
         boardReactionRepository.save(
                 BoardReaction.of(
@@ -72,7 +72,7 @@ public class BoardReactionServiceImpl
         Member member = getMemberEntity(memberId);
 
         BoardReaction boardReaction = boardReactionRepository.findByBoardAndMember(board, member)
-                .orElseThrow(() -> new ResourceNotFoundException(BOARD_LIKE_REACTION_NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException(BOARD_REACTION_NOT_FOUND));
 
         verifyReactionOwner(boardReaction, member);
 
@@ -92,9 +92,10 @@ public class BoardReactionServiceImpl
     public void addBoardDislike(Long boardId, Long memberId) {
 
         Board board = getBoardEntity(boardId);
+        Member member = getMemberEntity(memberId);
 
-        if (checkReactionExistence(DISLIKE, board))
-            throw new BoardBusinessException(BOARD_DISLIKE_REACTION_ALREADY_EXIST);
+        if (checkReactionExistence(board, member))
+            throw new BoardBusinessException(BOARD_REACTION_ALREADY_EXIST);
 
         boardReactionRepository.save(
                 BoardReaction.of(
@@ -112,7 +113,7 @@ public class BoardReactionServiceImpl
         Member member = getMemberEntity(memberId);
 
         BoardReaction boardReaction = boardReactionRepository.findByBoardAndMember(board, member)
-                .orElseThrow(() -> new ResourceNotFoundException(BOARD_DISLIKE_REACTION_NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException(BOARD_REACTION_NOT_FOUND));
 
         verifyReactionOwner(boardReaction, member);
 
@@ -120,13 +121,12 @@ public class BoardReactionServiceImpl
     }
 
     private boolean checkReactionExistence(
-            BoardReactionType reactionType,
-            Board board
+            Board board,
+            Member member
     ) {
-        return boardReactionRepository.existsByTypeAndBoardAndMember(
-                reactionType,
+        return boardReactionRepository.existsByBoardAndMember(
                 board,
-                board.getMember()
+                member
         );
     }
 

@@ -13,7 +13,7 @@ public interface BoardReactionRepository
 
     int countAllByTypeAndBoard(BoardReactionType type, Board board);
 
-    boolean existsByTypeAndBoardAndMember(BoardReactionType type, Board board, Member member);
+    boolean existsByBoardAndMember(Board board, Member member);
 
     Optional<BoardReaction> findByBoardAndMember(Board board, Member member);
 }

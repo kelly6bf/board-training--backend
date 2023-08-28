@@ -2,7 +2,6 @@ package site.board.boardtraining.domain.comment.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import site.board.boardtraining.domain.comment.constant.ArticleCommentReactionType;
 import site.board.boardtraining.domain.comment.entity.ArticleComment;
 import site.board.boardtraining.domain.comment.entity.ArticleCommentReaction;
 import site.board.boardtraining.domain.comment.exception.ArticleCommentBusinessException;
@@ -52,9 +51,10 @@ public class ArticleCommentReactionServiceImpl
     public void addArticleCommentLike(Long articleCommentId, Long memberId) {
 
         ArticleComment articleComment = getArticleCommentEntity(articleCommentId);
+        Member member = getMemberEntity(memberId);
 
-        if (checkReactionExistence(LIKE, articleComment))
-            throw new ArticleCommentBusinessException(ARTICLE_COMMENT_LIKE_REACTION_ALREADY_EXIST);
+        if (checkReactionExistence(articleComment, member))
+            throw new ArticleCommentBusinessException(ARTICLE_COMMENT_REACTION_ALREADY_EXIST);
 
         articleCommentReactionRepository.save(
                 ArticleCommentReaction.of(
@@ -72,7 +72,7 @@ public class ArticleCommentReactionServiceImpl
         Member member = getMemberEntity(memberId);
 
         ArticleCommentReaction articleCommentReaction = articleCommentReactionRepository.findByArticleCommentAndMember(articleComment, member)
-                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_COMMENT_LIKE_REACTION_NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_COMMENT_REACTION_NOT_FOUND));
 
         verifyReactionOwner(articleCommentReaction, member);
 
@@ -91,9 +91,10 @@ public class ArticleCommentReactionServiceImpl
     public void addArticleCommentDislike(Long articleCommentId, Long memberId) {
 
         ArticleComment articleComment = getArticleCommentEntity(articleCommentId);
+        Member member = getMemberEntity(memberId);
 
-        if (checkReactionExistence(DISLIKE, articleComment))
-            throw new ArticleCommentBusinessException(ARTICLE_COMMENT_DISLIKE_REACTION_ALREADY_EXIST);
+        if (checkReactionExistence(articleComment, member))
+            throw new ArticleCommentBusinessException(ARTICLE_COMMENT_REACTION_ALREADY_EXIST);
 
         articleCommentReactionRepository.save(
                 ArticleCommentReaction.of(
@@ -111,19 +112,18 @@ public class ArticleCommentReactionServiceImpl
         Member member = getMemberEntity(memberId);
 
         ArticleCommentReaction articleCommentReaction = articleCommentReactionRepository.findByArticleCommentAndMember(articleComment, member)
-                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_COMMENT_DISLIKE_REACTION_NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_COMMENT_REACTION_NOT_FOUND));
 
         articleCommentReactionRepository.delete(articleCommentReaction);
     }
 
     private boolean checkReactionExistence(
-            ArticleCommentReactionType articleCommentReactionType,
-            ArticleComment articleComment
+            ArticleComment articleComment,
+            Member member
     ) {
-        return articleCommentReactionRepository.existsByTypeAndArticleCommentAndMember(
-                articleCommentReactionType,
+        return articleCommentReactionRepository.existsByArticleCommentAndMember(
                 articleComment,
-                articleComment.getMember()
+                member
         );
     }
 

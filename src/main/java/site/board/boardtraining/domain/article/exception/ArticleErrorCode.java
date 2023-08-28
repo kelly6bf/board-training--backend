@@ -12,10 +12,8 @@ public enum ArticleErrorCode
         implements ErrorCode {
 
     ARTICLE_NOT_FOUND("ART-C-001", NOT_FOUND, "존재하지 않는 게시글입니다."),
-    ARTICLE_LIKE_REACTION_NOT_FOUND("ART-C-002", NOT_FOUND, "게시글 좋아요 반응이 존재하지 않습니다."),
-    ARTICLE_DISLIKE_REACTION_NOT_FOUND("ART-C-003", NOT_FOUND, "게시글 싫어요 반응이 존재하지 않습니다."),
-    ARTICLE_LIKE_REACTION_ALREADY_EXIST("ART-C-004", CONFLICT, "게시글 좋아요 반응이 이미 존재합니다."),
-    ARTICLE_DISLIKE_REACTION_ALREADY_EXIST("ART-C-005", CONFLICT, "게시글 싫어요 반응이 이미 존재합니다.");
+    ARTICLE_REACTION_NOT_FOUND("ART-C-002", NOT_FOUND, "게시글 반응이 존재하지 않습니다."),
+    ARTICLE_REACTION_ALREADY_EXIST("ART-C-003", CONFLICT, "게시글 반응이 이미 존재합니다.");
 
     private final String code;
     private final HttpStatus httpStatus;

@@ -2,7 +2,6 @@ package site.board.boardtraining.domain.article.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import site.board.boardtraining.domain.article.constant.ArticleReactionType;
 import site.board.boardtraining.domain.article.entity.Article;
 import site.board.boardtraining.domain.article.entity.ArticleReaction;
 import site.board.boardtraining.domain.article.exception.ArticleBusinessException;
@@ -52,9 +51,10 @@ public class ArticleReactionServiceImpl
     public void addArticleLike(Long articleId, Long memberId) {
 
         Article article = getArticleEntity(articleId);
+        Member member = getMemberEntity(memberId);
 
-        if (checkReactionExistence(LIKE, article))
-            throw new ArticleBusinessException(ARTICLE_LIKE_REACTION_ALREADY_EXIST);
+        if (checkReactionExistence(article, member))
+            throw new ArticleBusinessException(ARTICLE_REACTION_ALREADY_EXIST);
 
         articleReactionRepository.save(
                 ArticleReaction.of(
@@ -72,7 +72,7 @@ public class ArticleReactionServiceImpl
         Member member = getMemberEntity(memberId);
 
         ArticleReaction articleReaction = articleReactionRepository.findByArticleAndMember(article, member)
-                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_REACTION_NOT_FOUND));
 
         verifyReactionOwner(articleReaction, member);
 
@@ -92,9 +92,10 @@ public class ArticleReactionServiceImpl
     public void addArticleDislike(Long articleId, Long memberId) {
 
         Article article = getArticleEntity(articleId);
+        Member member = getMemberEntity(memberId);
 
-        if (checkReactionExistence(DISLIKE, article))
-            throw new ArticleBusinessException(ARTICLE_DISLIKE_REACTION_ALREADY_EXIST);
+        if (checkReactionExistence(article, member))
+            throw new ArticleBusinessException(ARTICLE_REACTION_ALREADY_EXIST);
 
         articleReactionRepository.save(
                 ArticleReaction.of(
@@ -112,7 +113,7 @@ public class ArticleReactionServiceImpl
         Member member = getMemberEntity(memberId);
 
         ArticleReaction articleReaction = articleReactionRepository.findByArticleAndMember(article, member)
-                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_DISLIKE_REACTION_NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_REACTION_NOT_FOUND));
 
         verifyReactionOwner(articleReaction, member);
 
@@ -120,13 +121,12 @@ public class ArticleReactionServiceImpl
     }
 
     private boolean checkReactionExistence(
-            ArticleReactionType reactionType,
-            Article article
+            Article article,
+            Member member
     ) {
-        return articleReactionRepository.existsByTypeAndArticleAndMember(
-                reactionType,
+        return articleReactionRepository.existsByArticleAndMember(
                 article,
-                article.getMember()
+                member
         );
     }
 
