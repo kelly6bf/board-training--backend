@@ -1,16 +1,16 @@
-package site.board.boardtraining.domain.reaction.service;
+package site.board.boardtraining.domain.article.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import site.board.boardtraining.domain.article.constant.ArticleReactionType;
 import site.board.boardtraining.domain.article.entity.Article;
-import site.board.boardtraining.domain.reaction.constant.ReactionType;
-import site.board.boardtraining.domain.reaction.entity.ArticleReaction;
-import site.board.boardtraining.domain.reaction.exception.ReactionBusinessException;
-import site.board.boardtraining.domain.reaction.repository.ArticleReactionRepository;
+import site.board.boardtraining.domain.article.entity.ArticleReaction;
+import site.board.boardtraining.domain.article.exception.ArticleBusinessException;
+import site.board.boardtraining.domain.article.repository.ArticleReactionRepository;
 
-import static site.board.boardtraining.domain.reaction.constant.ReactionType.DISLIKE;
-import static site.board.boardtraining.domain.reaction.constant.ReactionType.LIKE;
-import static site.board.boardtraining.domain.reaction.exception.ReactionErrorCode.*;
+import static site.board.boardtraining.domain.article.constant.ArticleReactionType.DISLIKE;
+import static site.board.boardtraining.domain.article.constant.ArticleReactionType.LIKE;
+import static site.board.boardtraining.domain.article.exception.ArticleErrorCode.*;
 
 @Transactional
 @Service
@@ -36,7 +36,7 @@ public class ArticleReactionServiceImpl
     public void addArticleLike(Article article) {
 
         if (checkReactionExistence(LIKE, article))
-            throw new ReactionBusinessException(LIKE_REACTION_ALREADY_EXIST);
+            throw new ArticleBusinessException(ARTICLE_LIKE_REACTION_ALREADY_EXIST);
 
         articleReactionRepository.save(
                 ArticleReaction.of(
@@ -51,7 +51,7 @@ public class ArticleReactionServiceImpl
     public void deleteArticleLike(Article article) {
 
         if (!checkReactionExistence(LIKE, article))
-            throw new ReactionBusinessException(LIKE_REACTION_NOT_FOUND);
+            throw new ArticleBusinessException(ARTICLE_LIKE_REACTION_NOT_FOUND);
 
         articleReactionRepository.deleteAllByArticleAndMember(
                 article,
@@ -72,7 +72,7 @@ public class ArticleReactionServiceImpl
     public void addArticleDislike(Article article) {
 
         if (checkReactionExistence(DISLIKE, article))
-            throw new ReactionBusinessException(DISLIKE_REACTION_ALREADY_EXIST);
+            throw new ArticleBusinessException(ARTICLE_DISLIKE_REACTION_ALREADY_EXIST);
 
         articleReactionRepository.save(
                 ArticleReaction.of(
@@ -87,7 +87,7 @@ public class ArticleReactionServiceImpl
     public void deleteArticleDislike(Article article) {
 
         if (!checkReactionExistence(DISLIKE, article))
-            throw new ReactionBusinessException(DISLIKE_REACTION_NOT_FOUND);
+            throw new ArticleBusinessException(ARTICLE_DISLIKE_REACTION_NOT_FOUND);
 
         articleReactionRepository.deleteAllByArticleAndMember(
                 article,
@@ -96,7 +96,7 @@ public class ArticleReactionServiceImpl
     }
 
     private boolean checkReactionExistence(
-            ReactionType reactionType,
+            ArticleReactionType reactionType,
             Article article
     ) {
         return articleReactionRepository.existsByTypeAndArticleAndMember(

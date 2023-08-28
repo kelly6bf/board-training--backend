@@ -1,19 +1,18 @@
-package site.board.boardtraining.domain.reaction.entity;
+package site.board.boardtraining.domain.board.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import site.board.boardtraining.domain.comment.entity.ArticleComment;
+import site.board.boardtraining.domain.board.constant.BoardReactionType;
 import site.board.boardtraining.domain.member.entity.Member;
-import site.board.boardtraining.domain.reaction.constant.ReactionType;
 import site.board.boardtraining.global.audit.BaseEntity;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "article_comment_reaction")
+@Table(name = "board_reaction")
 @Entity
-public class ArticleCommentReaction
+public class BoardReaction
         extends BaseEntity {
 
     @Id
@@ -22,32 +21,32 @@ public class ArticleCommentReaction
 
     @Enumerated(EnumType.STRING)
     @Column(length = 50, nullable = false)
-    private ReactionType type;
+    private BoardReactionType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private ArticleComment articleComment;
+    private Board board;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    public ArticleCommentReaction(
-            ReactionType type,
-            ArticleComment articleComment,
+    private BoardReaction(
+            BoardReactionType type,
+            Board board,
             Member member
     ) {
         this.type = type;
-        this.articleComment = articleComment;
+        this.board = board;
         this.member = member;
     }
 
-    public static ArticleCommentReaction of(
-            ReactionType type,
-            ArticleComment articleComment,
+    public static BoardReaction of(
+            BoardReactionType type,
+            Board board,
             Member member
     ) {
-        return new ArticleCommentReaction(
+        return new BoardReaction(
                 type,
-                articleComment,
+                board,
                 member
         );
     }

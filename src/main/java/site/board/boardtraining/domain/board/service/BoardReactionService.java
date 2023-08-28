@@ -1,4 +1,4 @@
-package site.board.boardtraining.domain.reaction.service;
+package site.board.boardtraining.domain.board.service;
 
 import site.board.boardtraining.domain.board.entity.Board;
 

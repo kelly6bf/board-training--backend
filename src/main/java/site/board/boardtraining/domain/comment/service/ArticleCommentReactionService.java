@@ -1,4 +1,4 @@
-package site.board.boardtraining.domain.reaction.service;
+package site.board.boardtraining.domain.comment.service;
 
 import site.board.boardtraining.domain.comment.entity.ArticleComment;
 

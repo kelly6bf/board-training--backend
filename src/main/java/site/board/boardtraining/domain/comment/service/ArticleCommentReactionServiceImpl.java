@@ -1,16 +1,16 @@
-package site.board.boardtraining.domain.reaction.service;
+package site.board.boardtraining.domain.comment.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.board.boardtraining.domain.comment.entity.ArticleComment;
-import site.board.boardtraining.domain.reaction.constant.ReactionType;
-import site.board.boardtraining.domain.reaction.entity.ArticleCommentReaction;
-import site.board.boardtraining.domain.reaction.exception.ReactionBusinessException;
-import site.board.boardtraining.domain.reaction.repository.ArticleCommentReactionRepository;
+import site.board.boardtraining.domain.comment.constant.ArticleCommentReactionType;
+import site.board.boardtraining.domain.comment.entity.ArticleCommentReaction;
+import site.board.boardtraining.domain.comment.exception.ArticleCommentBusinessException;
+import site.board.boardtraining.domain.comment.repository.ArticleCommentReactionRepository;
 
-import static site.board.boardtraining.domain.reaction.constant.ReactionType.DISLIKE;
-import static site.board.boardtraining.domain.reaction.constant.ReactionType.LIKE;
-import static site.board.boardtraining.domain.reaction.exception.ReactionErrorCode.*;
+import static site.board.boardtraining.domain.comment.constant.ArticleCommentReactionType.DISLIKE;
+import static site.board.boardtraining.domain.comment.constant.ArticleCommentReactionType.LIKE;
+import static site.board.boardtraining.domain.comment.exception.ArticleCommentErrorCode.*;
 
 @Transactional
 @Service
@@ -34,7 +34,7 @@ public class ArticleCommentReactionServiceImpl
     @Override
     public void addArticleCommentLike(ArticleComment articleComment) {
         if (checkReactionExistence(LIKE, articleComment))
-            throw new ReactionBusinessException(LIKE_REACTION_ALREADY_EXIST);
+            throw new ArticleCommentBusinessException(ARTICLE_COMMENT_LIKE_REACTION_ALREADY_EXIST);
 
         articleCommentReactionRepository.save(
                 ArticleCommentReaction.of(
@@ -48,7 +48,7 @@ public class ArticleCommentReactionServiceImpl
     @Override
     public void deleteArticleCommentLike(ArticleComment articleComment) {
         if (!checkReactionExistence(LIKE, articleComment))
-            throw new ReactionBusinessException(LIKE_REACTION_NOT_FOUND);
+            throw new ArticleCommentBusinessException(ARTICLE_COMMENT_LIKE_REACTION_NOT_FOUND);
 
         articleCommentReactionRepository.deleteAllByArticleCommentAndMember(
                 articleComment,
@@ -68,7 +68,7 @@ public class ArticleCommentReactionServiceImpl
     public void addArticleCommentDislike(ArticleComment articleComment) {
 
         if (checkReactionExistence(DISLIKE, articleComment))
-            throw new ReactionBusinessException(DISLIKE_REACTION_ALREADY_EXIST);
+            throw new ArticleCommentBusinessException(ARTICLE_COMMENT_DISLIKE_REACTION_ALREADY_EXIST);
 
         articleCommentReactionRepository.save(
                 ArticleCommentReaction.of(
@@ -83,7 +83,7 @@ public class ArticleCommentReactionServiceImpl
     public void deleteArticleCommentDislike(ArticleComment articleComment) {
 
         if (!checkReactionExistence(DISLIKE, articleComment))
-            throw new ReactionBusinessException(DISLIKE_REACTION_NOT_FOUND);
+            throw new ArticleCommentBusinessException(ARTICLE_COMMENT_DISLIKE_REACTION_NOT_FOUND);
 
         articleCommentReactionRepository.save(
                 ArticleCommentReaction.of(
@@ -95,11 +95,11 @@ public class ArticleCommentReactionServiceImpl
     }
 
     private boolean checkReactionExistence(
-            ReactionType reactionType,
+            ArticleCommentReactionType articleCommentReactionType,
             ArticleComment articleComment
     ) {
         return articleCommentReactionRepository.existsByTypeAndArticleCommentAndMember(
-                reactionType,
+                articleCommentReactionType,
                 articleComment,
                 articleComment.getMember()
         );

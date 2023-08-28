@@ -1,16 +1,16 @@
-package site.board.boardtraining.domain.reaction.service;
+package site.board.boardtraining.domain.board.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import site.board.boardtraining.domain.board.constant.BoardReactionType;
 import site.board.boardtraining.domain.board.entity.Board;
-import site.board.boardtraining.domain.reaction.constant.ReactionType;
-import site.board.boardtraining.domain.reaction.entity.BoardReaction;
-import site.board.boardtraining.domain.reaction.exception.ReactionBusinessException;
-import site.board.boardtraining.domain.reaction.repository.BoardReactionRepository;
+import site.board.boardtraining.domain.board.entity.BoardReaction;
+import site.board.boardtraining.domain.board.exception.BoardBusinessException;
+import site.board.boardtraining.domain.board.repository.BoardReactionRepository;
 
-import static site.board.boardtraining.domain.reaction.constant.ReactionType.DISLIKE;
-import static site.board.boardtraining.domain.reaction.constant.ReactionType.LIKE;
-import static site.board.boardtraining.domain.reaction.exception.ReactionErrorCode.*;
+import static site.board.boardtraining.domain.board.constant.BoardReactionType.DISLIKE;
+import static site.board.boardtraining.domain.board.constant.BoardReactionType.LIKE;
+import static site.board.boardtraining.domain.board.exception.BoardErrorCode.*;
 
 @Transactional
 @Service
@@ -36,7 +36,7 @@ public class BoardReactionServiceImpl
     public void addBoardLike(Board board) {
 
         if (checkReactionExistence(LIKE, board))
-            throw new ReactionBusinessException(LIKE_REACTION_ALREADY_EXIST);
+            throw new BoardBusinessException(BOARD_LIKE_REACTION_ALREADY_EXIST);
 
         boardReactionRepository.save(
                 BoardReaction.of(
@@ -51,7 +51,7 @@ public class BoardReactionServiceImpl
     public void deleteBoardLike(Board board) {
 
         if (!checkReactionExistence(LIKE, board))
-            throw new ReactionBusinessException(LIKE_REACTION_NOT_FOUND);
+            throw new BoardBusinessException(BOARD_LIKE_REACTION_NOT_FOUND);
 
         boardReactionRepository.deleteAllByBoardAndMember(
                 board,
@@ -71,7 +71,7 @@ public class BoardReactionServiceImpl
     @Override
     public void addBoardDislike(Board board) {
         if (checkReactionExistence(DISLIKE, board))
-            throw new ReactionBusinessException(DISLIKE_REACTION_ALREADY_EXIST);
+            throw new BoardBusinessException(BOARD_DISLIKE_REACTION_ALREADY_EXIST);
 
         boardReactionRepository.save(
                 BoardReaction.of(
@@ -85,7 +85,7 @@ public class BoardReactionServiceImpl
     @Override
     public void deleteBoardDislike(Board board) {
         if (!checkReactionExistence(DISLIKE, board))
-            throw new ReactionBusinessException(DISLIKE_REACTION_NOT_FOUND);
+            throw new BoardBusinessException(BOARD_DISLIKE_REACTION_NOT_FOUND);
 
         boardReactionRepository.deleteAllByBoardAndMember(
                 board,
@@ -94,7 +94,7 @@ public class BoardReactionServiceImpl
     }
 
     private boolean checkReactionExistence(
-            ReactionType reactionType,
+            BoardReactionType reactionType,
             Board board
     ) {
         return boardReactionRepository.existsByTypeAndBoardAndMember(

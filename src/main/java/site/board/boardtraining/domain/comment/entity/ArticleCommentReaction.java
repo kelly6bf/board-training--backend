@@ -1,19 +1,18 @@
-package site.board.boardtraining.domain.reaction.entity;
+package site.board.boardtraining.domain.comment.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import site.board.boardtraining.domain.board.entity.Board;
 import site.board.boardtraining.domain.member.entity.Member;
-import site.board.boardtraining.domain.reaction.constant.ReactionType;
+import site.board.boardtraining.domain.comment.constant.ArticleCommentReactionType;
 import site.board.boardtraining.global.audit.BaseEntity;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "board_reaction")
+@Table(name = "article_comment_reaction")
 @Entity
-public class BoardReaction
+public class ArticleCommentReaction
         extends BaseEntity {
 
     @Id
@@ -22,32 +21,32 @@ public class BoardReaction
 
     @Enumerated(EnumType.STRING)
     @Column(length = 50, nullable = false)
-    private ReactionType type;
+    private ArticleCommentReactionType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Board board;
+    private ArticleComment articleComment;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    private BoardReaction(
-            ReactionType type,
-            Board board,
+    public ArticleCommentReaction(
+            ArticleCommentReactionType type,
+            ArticleComment articleComment,
             Member member
     ) {
         this.type = type;
-        this.board = board;
+        this.articleComment = articleComment;
         this.member = member;
     }
 
-    public static BoardReaction of(
-            ReactionType type,
-            Board board,
+    public static ArticleCommentReaction of(
+            ArticleCommentReactionType type,
+            ArticleComment articleComment,
             Member member
     ) {
-        return new BoardReaction(
+        return new ArticleCommentReaction(
                 type,
-                board,
+                articleComment,
                 member
         );
     }

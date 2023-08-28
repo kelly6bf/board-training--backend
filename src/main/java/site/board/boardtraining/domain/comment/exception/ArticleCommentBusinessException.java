@@ -1,11 +1,11 @@
-package site.board.boardtraining.domain.reaction.exception;
+package site.board.boardtraining.domain.comment.exception;
 
 import site.board.boardtraining.global.exception.BusinessException;
 import site.board.boardtraining.global.exception.ErrorCode;
 
-public class ReactionBusinessException
+public class ArticleCommentBusinessException
         extends BusinessException {
-    public ReactionBusinessException(ErrorCode errorCode) {
+    public ArticleCommentBusinessException(ErrorCode errorCode) {
         super(errorCode);
     }
 }
