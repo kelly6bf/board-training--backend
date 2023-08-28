@@ -11,7 +11,7 @@ public interface BoardReactionRepository
 
     int countAllByTypeAndBoard(ReactionType type, Board board);
 
-    int deleteAllByBoardAndMember(Board board, Member member);
+    void deleteAllByBoardAndMember(Board board, Member member);
 
     boolean existsByTypeAndBoardAndMember(ReactionType type, Board board, Member member);
 }
