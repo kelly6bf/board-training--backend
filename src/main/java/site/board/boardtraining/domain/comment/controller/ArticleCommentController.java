@@ -8,6 +8,7 @@ import site.board.boardtraining.domain.comment.dto.api.CreateArticleCommentReque
 import site.board.boardtraining.domain.comment.dto.api.UpdateArticleCommentRequest;
 import site.board.boardtraining.domain.comment.dto.business.ArticleCommentsDto;
 import site.board.boardtraining.domain.comment.dto.business.DeleteArticleCommentDto;
+import site.board.boardtraining.domain.comment.service.ArticleCommentReactionService;
 import site.board.boardtraining.domain.comment.service.ArticleCommentService;
 import site.board.boardtraining.global.response.success.MultipleSuccessApiResponse;
 import site.board.boardtraining.global.response.success.SuccessApiResponse;
@@ -16,9 +17,14 @@ import site.board.boardtraining.global.response.success.SuccessApiResponse;
 public class ArticleCommentController {
 
     private final ArticleCommentService articleCommentService;
+    private final ArticleCommentReactionService articleCommentReactionService;
 
-    public ArticleCommentController(ArticleCommentService articleCommentService) {
+    public ArticleCommentController(
+            ArticleCommentService articleCommentService,
+            ArticleCommentReactionService articleCommentReactionService
+    ) {
         this.articleCommentService = articleCommentService;
+        this.articleCommentReactionService = articleCommentReactionService;
     }
 
     @GetMapping("/api/articles/{article-id}/comments")
@@ -108,6 +114,58 @@ public class ArticleCommentController {
         return ResponseEntity.ok(
                 SuccessApiResponse.of(
                         "성공적으로 댓글이 삭제되었습니다."
+                )
+        );
+    }
+
+    @PostMapping("/api/comments/{comment-id}/like")
+    public ResponseEntity<SuccessApiResponse> addArticleCommentLike(
+            @PathVariable("comment-id") Long commentId,
+            @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+        articleCommentReactionService.addArticleCommentLike(commentId, principal.getMemberId());
+        return ResponseEntity.ok(
+                SuccessApiResponse.of(
+                        "성공적으로 게시글 댓글 좋아요가 등록되었습니다."
+                )
+        );
+    }
+
+    @DeleteMapping("/api/comments/{comment-id}/like")
+    public ResponseEntity<SuccessApiResponse> deleteArticleCommentLike(
+            @PathVariable("comment-id") Long commentId,
+            @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+        articleCommentReactionService.deleteArticleCommentLike(commentId, principal.getMemberId());
+        return ResponseEntity.ok(
+                SuccessApiResponse.of(
+                        "성공적으로 게시글 댓글 좋아요가 삭제되었습니다."
+                )
+        );
+    }
+
+    @PostMapping("/api/comments/{comment-id}/dislike")
+    public ResponseEntity<SuccessApiResponse> addArticleCommentDislike(
+            @PathVariable("comment-id") Long commentId,
+            @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+        articleCommentReactionService.addArticleCommentDislike(commentId, principal.getMemberId());
+        return ResponseEntity.ok(
+                SuccessApiResponse.of(
+                        "성공적으로 게시글 댓글 싫어요가 등록되었습니다."
+                )
+        );
+    }
+
+    @DeleteMapping("/api/comments/{comment-id}/dislike")
+    public ResponseEntity<SuccessApiResponse> deleteArticleCommentDislike(
+            @PathVariable("comment-id") Long commentId,
+            @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+        articleCommentReactionService.deleteArticleCommentDislike(commentId, principal.getMemberId());
+        return ResponseEntity.ok(
+                SuccessApiResponse.of(
+                        "성공적으로 게시글 댓글 싫어요가 삭제되었습니다."
                 )
         );
     }

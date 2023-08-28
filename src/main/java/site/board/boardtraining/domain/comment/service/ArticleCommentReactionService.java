@@ -5,13 +5,13 @@ import site.board.boardtraining.domain.comment.entity.ArticleComment;
 public interface ArticleCommentReactionService {
     int getArticleCommentLikeCount(ArticleComment articleComment);
 
-    void addArticleCommentLike(ArticleComment articleComment);
+    void addArticleCommentLike(Long articleCommentId, Long memberId);
 
-    void deleteArticleCommentLike(ArticleComment articleComment);
+    void deleteArticleCommentLike(Long articleCommentId, Long memberId);
 
     int getArticleCommentDislikeCount(ArticleComment articleComment);
 
-    void addArticleCommentDislike(ArticleComment articleComment);
+    void addArticleCommentDislike(Long articleCommentId, Long memberId);
 
-    void deleteArticleCommentDislike(ArticleComment articleComment);
+    void deleteArticleCommentDislike(Long articleCommentId, Long memberId);
 }

@@ -11,10 +11,11 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public enum ArticleCommentErrorCode
         implements ErrorCode {
 
-    ARTICLE_COMMENT_LIKE_REACTION_NOT_FOUND("RE-C-001", NOT_FOUND, "게시글 댓글 좋아요 반응이 존재하지 않습니다."),
-    ARTICLE_COMMENT_DISLIKE_REACTION_NOT_FOUND("RE-C-002", NOT_FOUND, "게시글 댓글 싫어요 반응이 존재하지 않습니다."),
-    ARTICLE_COMMENT_LIKE_REACTION_ALREADY_EXIST("RE-C-003", CONFLICT, "게시글 댓글 좋아요 반응이 이미 존재합니다."),
-    ARTICLE_COMMENT_DISLIKE_REACTION_ALREADY_EXIST("RE-C-004", CONFLICT, "게시글 댓글 싫어요 반응이 이미 존재합니다.");
+    ARTICLE_COMMENT_NOT_FOUND("RE-C-001", NOT_FOUND, "게시글 댓글이 존재하지 않습니다."),
+    ARTICLE_COMMENT_LIKE_REACTION_NOT_FOUND("RE-C-002", NOT_FOUND, "게시글 댓글 좋아요 반응이 존재하지 않습니다."),
+    ARTICLE_COMMENT_DISLIKE_REACTION_NOT_FOUND("RE-C-003", NOT_FOUND, "게시글 댓글 싫어요 반응이 존재하지 않습니다."),
+    ARTICLE_COMMENT_LIKE_REACTION_ALREADY_EXIST("RE-C-004", CONFLICT, "게시글 댓글 좋아요 반응이 이미 존재합니다."),
+    ARTICLE_COMMENT_DISLIKE_REACTION_ALREADY_EXIST("RE-C-005", CONFLICT, "게시글 댓글 싫어요 반응이 이미 존재합니다.");
 
     private final String code;
     private final HttpStatus httpStatus;
