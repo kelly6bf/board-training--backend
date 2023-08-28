@@ -12,12 +12,16 @@ public record BoardDto(
         String description,
         String thumbnailImageUrl,
         LinkedHashSet<String> hashtags,
+        Integer likeCount,
+        Integer dislikeCount,
         MemberDto memberDto,
         LocalDateTime createAt
 ) {
     public static BoardDto from(
             Board board,
-            LinkedHashSet<String> hashtags
+            LinkedHashSet<String> hashtags,
+            Integer likeCount,
+            Integer dislikeCount
     ) {
         return new BoardDto(
                 board.getId(),
@@ -25,6 +29,8 @@ public record BoardDto(
                 board.getDescription(),
                 board.getThumbnailImageUrl(),
                 hashtags,
+                likeCount,
+                dislikeCount,
                 MemberDto.from(board.getMember()),
                 board.getCreatedAt()
         );

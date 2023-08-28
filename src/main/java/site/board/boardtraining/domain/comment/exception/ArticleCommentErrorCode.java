@@ -1,4 +1,4 @@
-package site.board.boardtraining.domain.board.exception;
+package site.board.boardtraining.domain.comment.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -8,18 +8,18 @@ import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Getter
-public enum BoardErrorCode
+public enum ArticleCommentErrorCode
         implements ErrorCode {
 
-    BOARD_NOT_FOUND("BD-C-001", NOT_FOUND, "존재하지 않는 게시판입니다."),
-    BOARD_REACTION_NOT_FOUND("BD-C-002", NOT_FOUND, "게시판 반응이 존재하지 않습니다."),
-    BOARD_REACTION_ALREADY_EXIST("BD-C-003", CONFLICT, "게시판 반응이 이미 존재합니다.");
+    ARTICLE_COMMENT_NOT_FOUND("RE-C-001", NOT_FOUND, "게시글 댓글이 존재하지 않습니다."),
+    ARTICLE_COMMENT_REACTION_NOT_FOUND("RE-C-002", NOT_FOUND, "게시글 댓글 반응이 존재하지 않습니다."),
+    ARTICLE_COMMENT_REACTION_ALREADY_EXIST("RE-C-003", CONFLICT, "게시글 댓글 반응이 이미 존재합니다.");
 
     private final String code;
     private final HttpStatus httpStatus;
     private final String message;
 
-    BoardErrorCode(
+    ArticleCommentErrorCode(
             String code,
             HttpStatus httpStatus,
             String message

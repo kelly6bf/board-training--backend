@@ -13,6 +13,19 @@ import static site.board.boardtraining.global.exception.GlobalErrorCode.RESOURCE
 public class GlobalExceptionHandler {
 
     @ExceptionHandler
+    protected ResponseEntity<ErrorApiResponse> handleBusinessException(
+            BusinessException e
+    ) {
+        log.error("[handle BusinessException] - {}", e.getMessage());
+        return new ResponseEntity<>(
+                ErrorApiResponse.of(
+                        e.getErrorCode()
+                ),
+                e.getErrorCode().getHttpStatus()
+        );
+    }
+
+    @ExceptionHandler
     protected ResponseEntity<ErrorApiResponse> handleResourceNotFoundException(
             ResourceNotFoundException e
     ) {

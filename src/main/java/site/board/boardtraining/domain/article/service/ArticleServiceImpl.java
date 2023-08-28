@@ -22,17 +22,20 @@ public class ArticleServiceImpl
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
     private final HashtagService hashtagService;
+    private final ArticleReactionService articleReactionService;
 
     public ArticleServiceImpl(
             ArticleRepository articleRepository,
             BoardRepository boardRepository,
             MemberRepository memberRepository,
-            HashtagService hashtagService
+            HashtagService hashtagService,
+            ArticleReactionService articleReactionService
     ) {
         this.articleRepository = articleRepository;
         this.boardRepository = boardRepository;
         this.memberRepository = memberRepository;
         this.hashtagService = hashtagService;
+        this.articleReactionService = articleReactionService;
     }
 
     @Transactional(readOnly = true)
@@ -43,7 +46,9 @@ public class ArticleServiceImpl
                     .map(article ->
                             ArticleDto.from(
                                     article,
-                                    hashtagService.getAllArticleHashtags(article)
+                                    hashtagService.getAllArticleHashtags(article),
+                                    articleReactionService.getArticleLikeCount(article),
+                                    articleReactionService.getArticleDislikeCount(article)
                             )
                     );
         }
@@ -57,7 +62,9 @@ public class ArticleServiceImpl
                 .map(article ->
                         ArticleDto.from(
                                 article,
-                                hashtagService.getAllArticleHashtags(article)
+                                hashtagService.getAllArticleHashtags(article),
+                                articleReactionService.getArticleLikeCount(article),
+                                articleReactionService.getArticleDislikeCount(article)
                         )
                 );
     }
@@ -69,7 +76,9 @@ public class ArticleServiceImpl
                 .map(article ->
                         ArticleDto.from(
                                 article,
-                                hashtagService.getAllArticleHashtags(article)
+                                hashtagService.getAllArticleHashtags(article),
+                                articleReactionService.getArticleLikeCount(article),
+                                articleReactionService.getArticleDislikeCount(article)
                         )
                 )
                 .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_NOT_FOUND));

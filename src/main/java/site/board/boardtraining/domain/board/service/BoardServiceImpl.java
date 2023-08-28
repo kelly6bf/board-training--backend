@@ -21,15 +21,18 @@ public class BoardServiceImpl
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
     private final HashtagService hashtagService;
+    private final BoardReactionService boardReactionService;
 
     public BoardServiceImpl(
             BoardRepository boardRepository,
             MemberRepository memberRepository,
-            HashtagService hashtagService
+            HashtagService hashtagService,
+            BoardReactionService boardReactionService
     ) {
         this.boardRepository = boardRepository;
         this.memberRepository = memberRepository;
         this.hashtagService = hashtagService;
+        this.boardReactionService = boardReactionService;
     }
 
     @Transactional(readOnly = true)
@@ -40,7 +43,9 @@ public class BoardServiceImpl
                     .map(board ->
                             BoardDto.from(
                                     board,
-                                    hashtagService.getAllBoardHashtags(board)
+                                    hashtagService.getAllBoardHashtags(board),
+                                    boardReactionService.getBoardLikeCount(board),
+                                    boardReactionService.getBoardDislikeCount(board)
                             )
                     );
         }
@@ -52,7 +57,9 @@ public class BoardServiceImpl
                 .map(board ->
                         BoardDto.from(
                                 board,
-                                hashtagService.getAllBoardHashtags(board)
+                                hashtagService.getAllBoardHashtags(board),
+                                boardReactionService.getBoardLikeCount(board),
+                                boardReactionService.getBoardDislikeCount(board)
                         )
                 );
     }
@@ -63,8 +70,10 @@ public class BoardServiceImpl
         return boardRepository.findById(boardId)
                 .map(board -> BoardDto.from(
                         board,
-                        hashtagService.getAllBoardHashtags(board))
-                )
+                        hashtagService.getAllBoardHashtags(board),
+                        boardReactionService.getBoardLikeCount(board),
+                        boardReactionService.getBoardDislikeCount(board)
+                ))
                 .orElseThrow(() -> new ResourceNotFoundException(BOARD_NOT_FOUND));
     }
 
