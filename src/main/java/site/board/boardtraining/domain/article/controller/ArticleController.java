@@ -12,6 +12,7 @@ import site.board.boardtraining.domain.article.dto.api.UpdateArticleRequest;
 import site.board.boardtraining.domain.article.dto.business.ArticleDto;
 import site.board.boardtraining.domain.article.dto.business.DeleteArticleDto;
 import site.board.boardtraining.domain.article.dto.business.SearchArticlesDto;
+import site.board.boardtraining.domain.article.service.ArticleReactionService;
 import site.board.boardtraining.domain.article.service.ArticleService;
 import site.board.boardtraining.domain.auth.data.CustomUserPrincipal;
 import site.board.boardtraining.global.response.success.MultipleSuccessApiResponse;
@@ -21,9 +22,14 @@ import site.board.boardtraining.global.response.success.SuccessApiResponse;
 @RestController
 public class ArticleController {
     private final ArticleService articleService;
+    private final ArticleReactionService articleReactionService;
 
-    public ArticleController(ArticleService articleService) {
+    public ArticleController(
+            ArticleService articleService,
+            ArticleReactionService articleReactionService
+    ) {
         this.articleService = articleService;
+        this.articleReactionService = articleReactionService;
     }
 
     @GetMapping("/api/boards/{board-id}/articles")
@@ -112,6 +118,58 @@ public class ArticleController {
         return ResponseEntity.ok(
                 SuccessApiResponse.of(
                         "성공적으로 게시글이 삭제되었습니다."
+                )
+        );
+    }
+
+    @PostMapping("/api/articles/{article-id}/like")
+    public ResponseEntity<SuccessApiResponse> addArticleLike(
+            @PathVariable("article-id") Long articleId,
+            @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+        articleReactionService.addArticleLike(articleId, principal.getMemberId());
+        return ResponseEntity.ok(
+                SuccessApiResponse.of(
+                        "성공적으로 게시글 좋아요가 등록되었습니다."
+                )
+        );
+    }
+
+    @DeleteMapping("/api/articles/{article-id}/like")
+    public ResponseEntity<SuccessApiResponse> deleteArticleLike(
+            @PathVariable("article-id") Long articleId,
+            @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+        articleReactionService.deleteArticleLike(articleId, principal.getMemberId());
+        return ResponseEntity.ok(
+                SuccessApiResponse.of(
+                        "성공적으로 게시글 좋아요가 삭제되었습니다."
+                )
+        );
+    }
+
+    @PostMapping("/api/articles/{article-id}/dislike")
+    public ResponseEntity<SuccessApiResponse> addArticleDislike(
+            @PathVariable("article-id") Long articleId,
+            @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+        articleReactionService.addArticleDislike(articleId, principal.getMemberId());
+        return ResponseEntity.ok(
+                SuccessApiResponse.of(
+                        "성공적으로 게시글 싫어요가 등록되었습니다."
+                )
+        );
+    }
+
+    @DeleteMapping("/api/articles/{article-id}/dislike")
+    public ResponseEntity<SuccessApiResponse> deleteArticleDislike(
+            @PathVariable("article-id") Long articleId,
+            @AuthenticationPrincipal CustomUserPrincipal principal
+    ) {
+        articleReactionService.deleteArticleDislike(articleId, principal.getMemberId());
+        return ResponseEntity.ok(
+                SuccessApiResponse.of(
+                        "성공적으로 게시글 싫어요가 삭제되었습니다."
                 )
         );
     }

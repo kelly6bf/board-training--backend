@@ -7,20 +7,36 @@ import site.board.boardtraining.domain.article.entity.Article;
 import site.board.boardtraining.domain.article.entity.ArticleReaction;
 import site.board.boardtraining.domain.article.exception.ArticleBusinessException;
 import site.board.boardtraining.domain.article.repository.ArticleReactionRepository;
+import site.board.boardtraining.domain.article.repository.ArticleRepository;
+import site.board.boardtraining.domain.member.entity.Member;
+import site.board.boardtraining.domain.member.repository.MemberRepository;
+import site.board.boardtraining.global.exception.ResourceNotFoundException;
+import site.board.boardtraining.global.exception.UnauthorizedResourceAccessException;
+
+import java.util.Objects;
 
 import static site.board.boardtraining.domain.article.constant.ArticleReactionType.DISLIKE;
 import static site.board.boardtraining.domain.article.constant.ArticleReactionType.LIKE;
 import static site.board.boardtraining.domain.article.exception.ArticleErrorCode.*;
+import static site.board.boardtraining.domain.member.exception.MemberErrorCode.MEMBER_NOT_FOUND;
 
 @Transactional
 @Service
 public class ArticleReactionServiceImpl
         implements ArticleReactionService {
 
+    private final ArticleRepository articleRepository;
     private final ArticleReactionRepository articleReactionRepository;
+    private final MemberRepository memberRepository;
 
-    public ArticleReactionServiceImpl(ArticleReactionRepository articleReactionRepository) {
+    public ArticleReactionServiceImpl(
+            ArticleRepository articleRepository,
+            ArticleReactionRepository articleReactionRepository,
+            MemberRepository memberRepository
+    ) {
+        this.articleRepository = articleRepository;
         this.articleReactionRepository = articleReactionRepository;
+        this.memberRepository = memberRepository;
     }
 
     @Transactional(readOnly = true)
@@ -33,7 +49,9 @@ public class ArticleReactionServiceImpl
     }
 
     @Override
-    public void addArticleLike(Article article) {
+    public void addArticleLike(Long articleId, Long memberId) {
+
+        Article article = getArticleEntity(articleId);
 
         if (checkReactionExistence(LIKE, article))
             throw new ArticleBusinessException(ARTICLE_LIKE_REACTION_ALREADY_EXIST);
@@ -42,21 +60,23 @@ public class ArticleReactionServiceImpl
                 ArticleReaction.of(
                         LIKE,
                         article,
-                        article.getMember()
+                        getMemberEntity(memberId)
                 )
         );
     }
 
     @Override
-    public void deleteArticleLike(Article article) {
+    public void deleteArticleLike(Long articleId, Long memberId) {
 
-        if (!checkReactionExistence(LIKE, article))
-            throw new ArticleBusinessException(ARTICLE_LIKE_REACTION_NOT_FOUND);
+        Article article = getArticleEntity(articleId);
+        Member member = getMemberEntity(memberId);
 
-        articleReactionRepository.deleteAllByArticleAndMember(
-                article,
-                article.getMember()
-        );
+        ArticleReaction articleReaction = articleReactionRepository.findByArticleAndMember(article, member)
+                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_NOT_FOUND));
+
+        verifyReactionOwner(articleReaction, member);
+
+        articleReactionRepository.delete(articleReaction);
     }
 
     @Transactional(readOnly = true)
@@ -69,7 +89,9 @@ public class ArticleReactionServiceImpl
     }
 
     @Override
-    public void addArticleDislike(Article article) {
+    public void addArticleDislike(Long articleId, Long memberId) {
+
+        Article article = getArticleEntity(articleId);
 
         if (checkReactionExistence(DISLIKE, article))
             throw new ArticleBusinessException(ARTICLE_DISLIKE_REACTION_ALREADY_EXIST);
@@ -78,21 +100,23 @@ public class ArticleReactionServiceImpl
                 ArticleReaction.of(
                         DISLIKE,
                         article,
-                        article.getMember()
+                        getMemberEntity(memberId)
                 )
         );
     }
 
     @Override
-    public void deleteArticleDislike(Article article) {
+    public void deleteArticleDislike(Long articleId, Long memberId) {
 
-        if (!checkReactionExistence(DISLIKE, article))
-            throw new ArticleBusinessException(ARTICLE_DISLIKE_REACTION_NOT_FOUND);
+        Article article = getArticleEntity(articleId);
+        Member member = getMemberEntity(memberId);
 
-        articleReactionRepository.deleteAllByArticleAndMember(
-                article,
-                article.getMember()
-        );
+        ArticleReaction articleReaction = articleReactionRepository.findByArticleAndMember(article, member)
+                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_DISLIKE_REACTION_NOT_FOUND));
+
+        verifyReactionOwner(articleReaction, member);
+
+        articleReactionRepository.delete(articleReaction);
     }
 
     private boolean checkReactionExistence(
@@ -104,5 +128,22 @@ public class ArticleReactionServiceImpl
                 article,
                 article.getMember()
         );
+    }
+
+    private void verifyReactionOwner(ArticleReaction reaction, Member member) {
+        if (!Objects.equals(reaction.getMember(), member))
+            throw new UnauthorizedResourceAccessException();
+    }
+
+    @Transactional(readOnly = true)
+    public Article getArticleEntity(Long articleId) {
+        return articleRepository.findById(articleId)
+                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
+    public Member getMemberEntity(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new ResourceNotFoundException(MEMBER_NOT_FOUND));
     }
 }
