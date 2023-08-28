@@ -12,7 +12,6 @@ public enum ReactionErrorCode
         implements ErrorCode {
 
     LIKE_REACTION_NOT_FOUND("RE-C-001", NOT_FOUND, "좋아요 반응이 존재하지 않습니다."),
-
     DISLIKE_REACTION_NOT_FOUND("RE-C-002", NOT_FOUND, "싫어요 반응이 존재하지 않습니다."),
     LIKE_REACTION_ALREADY_EXIST("RE-C-003", CONFLICT, "좋아요 반응이 이미 존재합니다."),
     DISLIKE_REACTION_ALREADY_EXIST("RE-C-004", CONFLICT, "싫어요 반응이 이미 존재합니다.");
