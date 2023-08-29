@@ -2,17 +2,23 @@ package site.board.boardtraining.domain.comment.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import site.board.boardtraining.domain.article.entity.Article;
 import site.board.boardtraining.domain.article.repository.ArticleRepository;
 import site.board.boardtraining.domain.comment.dto.business.*;
 import site.board.boardtraining.domain.comment.entity.ArticleComment;
 import site.board.boardtraining.domain.comment.repository.ArticleCommentRepository;
+import site.board.boardtraining.domain.member.entity.Member;
 import site.board.boardtraining.domain.member.repository.MemberRepository;
+import site.board.boardtraining.global.exception.ResourceNotFoundException;
 import site.board.boardtraining.global.exception.UnauthorizedResourceAccessException;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static site.board.boardtraining.domain.article.exception.ArticleErrorCode.ARTICLE_NOT_FOUND;
 import static site.board.boardtraining.domain.comment.constant.ArticleCommentType.PARENT;
+import static site.board.boardtraining.domain.comment.exception.ArticleCommentErrorCode.ARTICLE_COMMENT_NOT_FOUND;
+import static site.board.boardtraining.domain.member.exception.MemberErrorCode.MEMBER_NOT_FOUND;
 
 @Transactional
 @Service
@@ -41,7 +47,9 @@ public class ArticleCommentServiceImpl
     public List<ArticleCommentsDto> getArticleComments(
             Long articleId
     ) {
-        return articleCommentRepository.findAllByArticle_IdAndCommentType(articleId, PARENT)
+        Article article = getArticleEntity(articleId);
+
+        return articleCommentRepository.findAllByArticleAndCommentType(article, PARENT)
                 .stream()
                 .map(parentComment -> ArticleCommentsDto.from(
                         parentComment,
@@ -65,27 +73,27 @@ public class ArticleCommentServiceImpl
     public void createParentArticleComment(CreateArticleCommentDto dto) {
         articleCommentRepository.save(
                 dto.toEntity(
-                        articleRepository.getReferenceById(dto.articleId()),
-                        memberRepository.getReferenceById(dto.memberId())
+                        getArticleEntity(dto.articleId()),
+                        getMemberEntity(dto.memberId())
                 )
         );
     }
 
     @Override
     public void createChildArticleComment(CreateArticleCommentDto dto) {
-        ArticleComment parentComment = articleCommentRepository.getReferenceById(dto.parentCommentId());
+        ArticleComment parentComment = getArticleCommentEntity(dto.parentCommentId());
 
         articleCommentRepository.save(
                 dto.toEntity(
                         parentComment.getArticle(),
-                        memberRepository.getReferenceById(dto.memberId())
+                        getMemberEntity(dto.memberId())
                 )
         );
     }
 
     @Override
     public void updateArticleComment(UpdateArticleCommentDto dto) {
-        ArticleComment savedArticleComment = articleCommentRepository.getReferenceById(dto.commentId());
+        ArticleComment savedArticleComment = getArticleCommentEntity(dto.commentId());
 
         verifyArticleCommentOwner(
                 savedArticleComment,
@@ -97,7 +105,7 @@ public class ArticleCommentServiceImpl
 
     @Override
     public void deleteArticleComment(DeleteArticleCommentDto dto) {
-        ArticleComment savedArticleComment = articleCommentRepository.getReferenceById(dto.commentId());
+        ArticleComment savedArticleComment = getArticleCommentEntity(dto.commentId());
 
         verifyArticleCommentOwner(
                 savedArticleComment,
@@ -110,6 +118,21 @@ public class ArticleCommentServiceImpl
         }
 
         articleCommentRepository.delete(savedArticleComment);
+    }
+
+    private Member getMemberEntity(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new ResourceNotFoundException(MEMBER_NOT_FOUND));
+    }
+
+    private Article getArticleEntity(Long articleId) {
+        return articleRepository.findById(articleId)
+                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_NOT_FOUND));
+    }
+
+    private ArticleComment getArticleCommentEntity(Long articleCommentId) {
+        return articleCommentRepository.findById(articleCommentId)
+                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_COMMENT_NOT_FOUND));
     }
 
     private void verifyArticleCommentOwner(

@@ -70,9 +70,7 @@ public class ArticleCommentReactionServiceImpl
 
         ArticleComment articleComment = getArticleCommentEntity(articleCommentId);
         Member member = getMemberEntity(memberId);
-
-        ArticleCommentReaction articleCommentReaction = articleCommentReactionRepository.findByArticleCommentAndMember(articleComment, member)
-                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_COMMENT_REACTION_NOT_FOUND));
+        ArticleCommentReaction articleCommentReaction = getArticleCommentReactionEntity(articleComment, member);
 
         verifyReactionOwner(articleCommentReaction, member);
 
@@ -110,11 +108,29 @@ public class ArticleCommentReactionServiceImpl
 
         ArticleComment articleComment = getArticleCommentEntity(articleCommentId);
         Member member = getMemberEntity(memberId);
-
-        ArticleCommentReaction articleCommentReaction = articleCommentReactionRepository.findByArticleCommentAndMember(articleComment, member)
-                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_COMMENT_REACTION_NOT_FOUND));
+        ArticleCommentReaction articleCommentReaction = getArticleCommentReactionEntity(articleComment, member);
 
         articleCommentReactionRepository.delete(articleCommentReaction);
+    }
+
+    private Member getMemberEntity(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new ResourceNotFoundException(MEMBER_NOT_FOUND));
+    }
+
+    private ArticleComment getArticleCommentEntity(Long articleCommentId) {
+        return articleCommentRepository.findById(articleCommentId)
+                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_COMMENT_NOT_FOUND));
+    }
+
+    private ArticleCommentReaction getArticleCommentReactionEntity(ArticleComment articleComment, Member member) {
+        return articleCommentReactionRepository.findByArticleCommentAndMember(articleComment, member)
+                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_COMMENT_REACTION_NOT_FOUND));
+    }
+
+    private void verifyReactionOwner(ArticleCommentReaction reaction, Member member) {
+        if (!Objects.equals(reaction.getMember(), member))
+            throw new UnauthorizedResourceAccessException();
     }
 
     private boolean checkReactionExistence(
@@ -125,22 +141,5 @@ public class ArticleCommentReactionServiceImpl
                 articleComment,
                 member
         );
-    }
-
-    private void verifyReactionOwner(ArticleCommentReaction reaction, Member member) {
-        if (!Objects.equals(reaction.getMember(), member))
-            throw new UnauthorizedResourceAccessException();
-    }
-
-    @Transactional(readOnly = true)
-    public ArticleComment getArticleCommentEntity(Long articleCommentId) {
-        return articleCommentRepository.findById(articleCommentId)
-                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_COMMENT_NOT_FOUND));
-    }
-
-    @Transactional(readOnly = true)
-    public Member getMemberEntity(Long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new ResourceNotFoundException(MEMBER_NOT_FOUND));
     }
 }

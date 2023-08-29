@@ -110,7 +110,7 @@ public class HashtagServiceImpl
         articleHashtagRepository.deleteAllByArticle(article);
     }
 
-    public Hashtag createHashtag(String hashtagTitle) {
+    private Hashtag createHashtag(String hashtagTitle) {
         return hashtagRepository.save(
                 Hashtag.of(hashtagTitle)
         );
