@@ -10,9 +10,10 @@ import site.board.boardtraining.domain.hashtag.service.HashtagService;
 import site.board.boardtraining.domain.member.entity.Member;
 import site.board.boardtraining.domain.member.repository.MemberRepository;
 import site.board.boardtraining.global.exception.ResourceNotFoundException;
-import site.board.boardtraining.global.exception.UnauthorizedResourceAccessException;
+import site.board.boardtraining.global.exception.UnauthorizedResourceProcessException;
 
 import static site.board.boardtraining.domain.board.exception.BoardErrorCode.BOARD_NOT_FOUND;
+import static site.board.boardtraining.domain.board.exception.BoardErrorCode.UNAUTHORIZED_BOARD_PROCESS;
 import static site.board.boardtraining.domain.member.exception.MemberErrorCode.MEMBER_NOT_FOUND;
 
 @Transactional
@@ -145,6 +146,6 @@ public class BoardServiceImpl
             Long memberId
     ) {
         if (!board.getMember().getId().equals(memberId))
-            throw new UnauthorizedResourceAccessException();
+            throw new UnauthorizedResourceProcessException(UNAUTHORIZED_BOARD_PROCESS);
     }
 }

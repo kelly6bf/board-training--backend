@@ -10,7 +10,7 @@ import site.board.boardtraining.domain.article.repository.ArticleRepository;
 import site.board.boardtraining.domain.member.entity.Member;
 import site.board.boardtraining.domain.member.repository.MemberRepository;
 import site.board.boardtraining.global.exception.ResourceNotFoundException;
-import site.board.boardtraining.global.exception.UnauthorizedResourceAccessException;
+import site.board.boardtraining.global.exception.UnauthorizedResourceProcessException;
 
 import java.util.Objects;
 
@@ -133,7 +133,7 @@ public class ArticleReactionServiceImpl
 
     private void verifyReactionOwner(ArticleReaction reaction, Member member) {
         if (!Objects.equals(reaction.getMember(), member))
-            throw new UnauthorizedResourceAccessException();
+            throw new UnauthorizedResourceProcessException(UNAUTHORIZED_ARTICLE_REACTION_PROCESS);
     }
 
     private boolean checkReactionExistence(

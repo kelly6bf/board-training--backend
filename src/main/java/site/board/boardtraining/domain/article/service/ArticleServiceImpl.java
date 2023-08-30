@@ -12,9 +12,10 @@ import site.board.boardtraining.domain.hashtag.service.HashtagService;
 import site.board.boardtraining.domain.member.entity.Member;
 import site.board.boardtraining.domain.member.repository.MemberRepository;
 import site.board.boardtraining.global.exception.ResourceNotFoundException;
-import site.board.boardtraining.global.exception.UnauthorizedResourceAccessException;
+import site.board.boardtraining.global.exception.UnauthorizedResourceProcessException;
 
 import static site.board.boardtraining.domain.article.exception.ArticleErrorCode.ARTICLE_NOT_FOUND;
+import static site.board.boardtraining.domain.article.exception.ArticleErrorCode.UNAUTHORIZED_ARTICLE_PROCESS;
 import static site.board.boardtraining.domain.board.exception.BoardErrorCode.BOARD_NOT_FOUND;
 import static site.board.boardtraining.domain.member.exception.MemberErrorCode.MEMBER_NOT_FOUND;
 
@@ -153,6 +154,6 @@ public class ArticleServiceImpl
             Long memberId
     ) {
         if (!article.getMember().getId().equals(memberId))
-            throw new UnauthorizedResourceAccessException();
+            throw new UnauthorizedResourceProcessException(UNAUTHORIZED_ARTICLE_PROCESS);
     }
 }

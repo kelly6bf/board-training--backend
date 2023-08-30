@@ -10,7 +10,7 @@ import site.board.boardtraining.domain.comment.repository.ArticleCommentReposito
 import site.board.boardtraining.domain.member.entity.Member;
 import site.board.boardtraining.domain.member.repository.MemberRepository;
 import site.board.boardtraining.global.exception.ResourceNotFoundException;
-import site.board.boardtraining.global.exception.UnauthorizedResourceAccessException;
+import site.board.boardtraining.global.exception.UnauthorizedResourceProcessException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import static site.board.boardtraining.domain.article.exception.ArticleErrorCode.ARTICLE_NOT_FOUND;
 import static site.board.boardtraining.domain.comment.constant.ArticleCommentType.PARENT;
 import static site.board.boardtraining.domain.comment.exception.ArticleCommentErrorCode.ARTICLE_COMMENT_NOT_FOUND;
+import static site.board.boardtraining.domain.comment.exception.ArticleCommentErrorCode.UNAUTHORIZED_ARTICLE_COMMENT_PROCESS;
 import static site.board.boardtraining.domain.member.exception.MemberErrorCode.MEMBER_NOT_FOUND;
 
 @Transactional
@@ -140,6 +141,6 @@ public class ArticleCommentServiceImpl
             Long memberId
     ) {
         if (!articleComment.getMember().getId().equals(memberId))
-            throw new UnauthorizedResourceAccessException();
+            throw new UnauthorizedResourceProcessException(UNAUTHORIZED_ARTICLE_COMMENT_PROCESS);
     }
 }

@@ -2,15 +2,17 @@ package site.board.boardtraining.domain.comment.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import site.board.boardtraining.domain.article.exception.ArticleErrorCode;
 import site.board.boardtraining.domain.comment.entity.ArticleComment;
 import site.board.boardtraining.domain.comment.entity.ArticleCommentReaction;
 import site.board.boardtraining.domain.comment.exception.ArticleCommentBusinessException;
+import site.board.boardtraining.domain.comment.exception.ArticleCommentErrorCode;
 import site.board.boardtraining.domain.comment.repository.ArticleCommentReactionRepository;
 import site.board.boardtraining.domain.comment.repository.ArticleCommentRepository;
 import site.board.boardtraining.domain.member.entity.Member;
 import site.board.boardtraining.domain.member.repository.MemberRepository;
 import site.board.boardtraining.global.exception.ResourceNotFoundException;
-import site.board.boardtraining.global.exception.UnauthorizedResourceAccessException;
+import site.board.boardtraining.global.exception.UnauthorizedResourceProcessException;
 
 import java.util.Objects;
 
@@ -130,7 +132,7 @@ public class ArticleCommentReactionServiceImpl
 
     private void verifyReactionOwner(ArticleCommentReaction reaction, Member member) {
         if (!Objects.equals(reaction.getMember(), member))
-            throw new UnauthorizedResourceAccessException();
+            throw new UnauthorizedResourceProcessException(UNAUTHORIZED_ARTICLE_COMMENT_REACTION_PROCESS);
     }
 
     private boolean checkReactionExistence(

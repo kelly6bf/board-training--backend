@@ -5,12 +5,13 @@ import org.springframework.transaction.annotation.Transactional;
 import site.board.boardtraining.domain.board.entity.Board;
 import site.board.boardtraining.domain.board.entity.BoardReaction;
 import site.board.boardtraining.domain.board.exception.BoardBusinessException;
+import site.board.boardtraining.domain.board.exception.BoardErrorCode;
 import site.board.boardtraining.domain.board.repository.BoardReactionRepository;
 import site.board.boardtraining.domain.board.repository.BoardRepository;
 import site.board.boardtraining.domain.member.entity.Member;
 import site.board.boardtraining.domain.member.repository.MemberRepository;
 import site.board.boardtraining.global.exception.ResourceNotFoundException;
-import site.board.boardtraining.global.exception.UnauthorizedResourceAccessException;
+import site.board.boardtraining.global.exception.UnauthorizedResourceProcessException;
 
 import java.util.Objects;
 
@@ -135,7 +136,7 @@ public class BoardReactionServiceImpl
 
     private void verifyReactionOwner(BoardReaction reaction, Member member) {
         if (!Objects.equals(reaction.getMember(), member))
-            throw new UnauthorizedResourceAccessException();
+            throw new UnauthorizedResourceProcessException(UNAUTHORIZED_BOARD_REACTION_PROCESS);
     }
 
     private boolean checkReactionExistence(
