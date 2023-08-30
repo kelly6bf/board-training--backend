@@ -33,10 +33,9 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(
                 ErrorApiResponse.of(
-                        RESOURCE_NOT_FOUND,
-                        e.getMessage()
+                        e.getErrorCode()
                 ),
-                RESOURCE_NOT_FOUND.getHttpStatus()
+                e.getErrorCode().getHttpStatus()
         );
     }
 }
