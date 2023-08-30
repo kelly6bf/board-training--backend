@@ -10,7 +10,7 @@ import site.board.boardtraining.domain.article.repository.ArticleRepository;
 import site.board.boardtraining.domain.member.entity.Member;
 import site.board.boardtraining.domain.member.repository.MemberRepository;
 import site.board.boardtraining.global.exception.ResourceNotFoundException;
-import site.board.boardtraining.global.exception.UnauthorizedResourceAccessException;
+import site.board.boardtraining.global.exception.UnauthorizedResourceProcessException;
 
 import java.util.Objects;
 
@@ -70,9 +70,7 @@ public class ArticleReactionServiceImpl
 
         Article article = getArticleEntity(articleId);
         Member member = getMemberEntity(memberId);
-
-        ArticleReaction articleReaction = articleReactionRepository.findByArticleAndMember(article, member)
-                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_REACTION_NOT_FOUND));
+        ArticleReaction articleReaction = getArticleReactionEntity(article, member);
 
         verifyReactionOwner(articleReaction, member);
 
@@ -111,13 +109,31 @@ public class ArticleReactionServiceImpl
 
         Article article = getArticleEntity(articleId);
         Member member = getMemberEntity(memberId);
-
-        ArticleReaction articleReaction = articleReactionRepository.findByArticleAndMember(article, member)
-                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_REACTION_NOT_FOUND));
+        ArticleReaction articleReaction = getArticleReactionEntity(article, member);
 
         verifyReactionOwner(articleReaction, member);
 
         articleReactionRepository.delete(articleReaction);
+    }
+
+    private Member getMemberEntity(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new ResourceNotFoundException(MEMBER_NOT_FOUND));
+    }
+
+    private Article getArticleEntity(Long articleId) {
+        return articleRepository.findById(articleId)
+                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_NOT_FOUND));
+    }
+
+    private ArticleReaction getArticleReactionEntity(Article article, Member member) {
+        return articleReactionRepository.findByArticleAndMember(article, member)
+                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_REACTION_NOT_FOUND));
+    }
+
+    private void verifyReactionOwner(ArticleReaction reaction, Member member) {
+        if (!Objects.equals(reaction.getMember(), member))
+            throw new UnauthorizedResourceProcessException(UNAUTHORIZED_ARTICLE_REACTION_PROCESS);
     }
 
     private boolean checkReactionExistence(
@@ -128,22 +144,5 @@ public class ArticleReactionServiceImpl
                 article,
                 member
         );
-    }
-
-    private void verifyReactionOwner(ArticleReaction reaction, Member member) {
-        if (!Objects.equals(reaction.getMember(), member))
-            throw new UnauthorizedResourceAccessException();
-    }
-
-    @Transactional(readOnly = true)
-    public Article getArticleEntity(Long articleId) {
-        return articleRepository.findById(articleId)
-                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_NOT_FOUND));
-    }
-
-    @Transactional(readOnly = true)
-    public Member getMemberEntity(Long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new ResourceNotFoundException(MEMBER_NOT_FOUND));
     }
 }

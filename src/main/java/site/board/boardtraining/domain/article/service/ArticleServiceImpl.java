@@ -9,12 +9,15 @@ import site.board.boardtraining.domain.article.repository.ArticleRepository;
 import site.board.boardtraining.domain.board.entity.Board;
 import site.board.boardtraining.domain.board.repository.BoardRepository;
 import site.board.boardtraining.domain.hashtag.service.HashtagService;
+import site.board.boardtraining.domain.member.entity.Member;
 import site.board.boardtraining.domain.member.repository.MemberRepository;
 import site.board.boardtraining.global.exception.ResourceNotFoundException;
-import site.board.boardtraining.global.exception.UnauthorizedResourceAccessException;
+import site.board.boardtraining.global.exception.UnauthorizedResourceProcessException;
 
 import static site.board.boardtraining.domain.article.exception.ArticleErrorCode.ARTICLE_NOT_FOUND;
+import static site.board.boardtraining.domain.article.exception.ArticleErrorCode.UNAUTHORIZED_ARTICLE_PROCESS;
 import static site.board.boardtraining.domain.board.exception.BoardErrorCode.BOARD_NOT_FOUND;
+import static site.board.boardtraining.domain.member.exception.MemberErrorCode.MEMBER_NOT_FOUND;
 
 @Transactional
 @Service
@@ -74,24 +77,22 @@ public class ArticleServiceImpl
     @Transactional(readOnly = true)
     @Override
     public ArticleDto getArticle(Long articleId) {
-        return articleRepository.findById(articleId)
-                .map(article ->
-                        ArticleDto.from(
-                                article,
-                                hashtagService.getAllArticleHashtags(article),
-                                articleReactionService.getArticleLikeCount(article),
-                                articleReactionService.getArticleDislikeCount(article)
-                        )
-                )
-                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_NOT_FOUND));
+        Article article = getArticleEntity(articleId);
+
+        return ArticleDto.from(
+                article,
+                hashtagService.getAllArticleHashtags(article),
+                articleReactionService.getArticleLikeCount(article),
+                articleReactionService.getArticleDislikeCount(article)
+        );
     }
 
     @Override
     public Long createArticle(CreateArticleDto dto) {
         Article createdArticle = articleRepository.save(
                 dto.toEntity(
-                        boardRepository.getReferenceById(dto.boardId()),
-                        memberRepository.getReferenceById(dto.memberId())
+                        getBoardEntity(dto.boardId()),
+                        getMemberEntity(dto.memberId())
                 )
         );
 
@@ -105,7 +106,7 @@ public class ArticleServiceImpl
 
     @Override
     public void updateArticle(UpdateArticleDto dto) {
-        Article savedArticle = articleRepository.getReferenceById(dto.articleId());
+        Article savedArticle = getArticleEntity(dto.articleId());
 
         verifyArticleOwner(savedArticle, dto.memberId());
 
@@ -124,7 +125,7 @@ public class ArticleServiceImpl
 
     @Override
     public void deleteArticle(DeleteArticleDto dto) {
-        Article savedArticle = articleRepository.getReferenceById(dto.articleId());
+        Article savedArticle = getArticleEntity(dto.articleId());
 
         verifyArticleOwner(savedArticle, dto.memberId());
 
@@ -133,10 +134,19 @@ public class ArticleServiceImpl
         articleRepository.delete(savedArticle);
     }
 
-    @Transactional(readOnly = true)
-    public Board getBoardEntity(Long boardId) {
+    private Member getMemberEntity(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new ResourceNotFoundException(MEMBER_NOT_FOUND));
+    }
+
+    private Board getBoardEntity(Long boardId) {
         return boardRepository.findById(boardId)
                 .orElseThrow(() -> new ResourceNotFoundException(BOARD_NOT_FOUND));
+    }
+
+    private Article getArticleEntity(Long articleId) {
+        return articleRepository.findById(articleId)
+                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_NOT_FOUND));
     }
 
     private void verifyArticleOwner(
@@ -144,6 +154,6 @@ public class ArticleServiceImpl
             Long memberId
     ) {
         if (!article.getMember().getId().equals(memberId))
-            throw new UnauthorizedResourceAccessException();
+            throw new UnauthorizedResourceProcessException(UNAUTHORIZED_ARTICLE_PROCESS);
     }
 }

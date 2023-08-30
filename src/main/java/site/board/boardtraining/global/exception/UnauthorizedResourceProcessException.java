@@ -3,20 +3,19 @@ package site.board.boardtraining.global.exception;
 import lombok.Getter;
 
 @Getter
-public class ResourceNotFoundException
+public class UnauthorizedResourceProcessException
         extends RuntimeException {
+
     private final ErrorCode errorCode;
 
-    public ResourceNotFoundException(
-            final ErrorCode errorCode
-    ) {
+    public UnauthorizedResourceProcessException(ErrorCode errorCode) {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
 
-    public ResourceNotFoundException(
-            final ErrorCode errorCode,
-            Throwable cause
+    public UnauthorizedResourceProcessException(
+            Throwable cause,
+            ErrorCode errorCode
     ) {
         super(
                 errorCode.getMessage(),

@@ -7,11 +7,14 @@ import site.board.boardtraining.domain.board.dto.business.*;
 import site.board.boardtraining.domain.board.entity.Board;
 import site.board.boardtraining.domain.board.repository.BoardRepository;
 import site.board.boardtraining.domain.hashtag.service.HashtagService;
+import site.board.boardtraining.domain.member.entity.Member;
 import site.board.boardtraining.domain.member.repository.MemberRepository;
 import site.board.boardtraining.global.exception.ResourceNotFoundException;
-import site.board.boardtraining.global.exception.UnauthorizedResourceAccessException;
+import site.board.boardtraining.global.exception.UnauthorizedResourceProcessException;
 
 import static site.board.boardtraining.domain.board.exception.BoardErrorCode.BOARD_NOT_FOUND;
+import static site.board.boardtraining.domain.board.exception.BoardErrorCode.UNAUTHORIZED_BOARD_PROCESS;
+import static site.board.boardtraining.domain.member.exception.MemberErrorCode.MEMBER_NOT_FOUND;
 
 @Transactional
 @Service
@@ -67,21 +70,21 @@ public class BoardServiceImpl
     @Transactional(readOnly = true)
     @Override
     public BoardDto getBoard(Long boardId) {
-        return boardRepository.findById(boardId)
-                .map(board -> BoardDto.from(
-                        board,
-                        hashtagService.getAllBoardHashtags(board),
-                        boardReactionService.getBoardLikeCount(board),
-                        boardReactionService.getBoardDislikeCount(board)
-                ))
-                .orElseThrow(() -> new ResourceNotFoundException(BOARD_NOT_FOUND));
+        Board board = getBoardEntity(boardId);
+
+        return BoardDto.from(
+                board,
+                hashtagService.getAllBoardHashtags(board),
+                boardReactionService.getBoardLikeCount(board),
+                boardReactionService.getBoardDislikeCount(board)
+        );
     }
 
     @Override
     public Long createBoard(CreateBoardDto dto) {
         Board createdBoard = boardRepository.save(
                 dto.toEntity(
-                        memberRepository.getReferenceById(dto.memberId())
+                        getMemberEntity(dto.memberId())
                 )
         );
 
@@ -95,7 +98,7 @@ public class BoardServiceImpl
 
     @Override
     public void updateBoard(UpdateBoardDto dto) {
-        Board savedBoard = boardRepository.getReferenceById(dto.boardId());
+        Board savedBoard = getBoardEntity(dto.boardId());
 
         verifyBoardOwner(
                 savedBoard,
@@ -116,7 +119,7 @@ public class BoardServiceImpl
 
     @Override
     public void deleteBoard(DeleteBoardDto dto) {
-        Board savedBoard = boardRepository.getReferenceById(dto.boardId());
+        Board savedBoard = getBoardEntity(dto.boardId());
 
         verifyBoardOwner(
                 savedBoard,
@@ -128,11 +131,21 @@ public class BoardServiceImpl
         boardRepository.delete(savedBoard);
     }
 
+    private Member getMemberEntity(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new ResourceNotFoundException(MEMBER_NOT_FOUND));
+    }
+
+    private Board getBoardEntity(Long boardId) {
+        return boardRepository.findById(boardId)
+                .orElseThrow(() -> new ResourceNotFoundException(BOARD_NOT_FOUND));
+    }
+
     private void verifyBoardOwner(
             Board board,
             Long memberId
     ) {
         if (!board.getMember().getId().equals(memberId))
-            throw new UnauthorizedResourceAccessException();
+            throw new UnauthorizedResourceProcessException(UNAUTHORIZED_BOARD_PROCESS);
     }
 }

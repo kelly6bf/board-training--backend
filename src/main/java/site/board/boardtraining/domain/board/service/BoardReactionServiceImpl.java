@@ -5,12 +5,13 @@ import org.springframework.transaction.annotation.Transactional;
 import site.board.boardtraining.domain.board.entity.Board;
 import site.board.boardtraining.domain.board.entity.BoardReaction;
 import site.board.boardtraining.domain.board.exception.BoardBusinessException;
+import site.board.boardtraining.domain.board.exception.BoardErrorCode;
 import site.board.boardtraining.domain.board.repository.BoardReactionRepository;
 import site.board.boardtraining.domain.board.repository.BoardRepository;
 import site.board.boardtraining.domain.member.entity.Member;
 import site.board.boardtraining.domain.member.repository.MemberRepository;
 import site.board.boardtraining.global.exception.ResourceNotFoundException;
-import site.board.boardtraining.global.exception.UnauthorizedResourceAccessException;
+import site.board.boardtraining.global.exception.UnauthorizedResourceProcessException;
 
 import java.util.Objects;
 
@@ -71,8 +72,7 @@ public class BoardReactionServiceImpl
         Board board = getBoardEntity(boardId);
         Member member = getMemberEntity(memberId);
 
-        BoardReaction boardReaction = boardReactionRepository.findByBoardAndMember(board, member)
-                .orElseThrow(() -> new ResourceNotFoundException(BOARD_REACTION_NOT_FOUND));
+        BoardReaction boardReaction = getBoardReactionEntity(board, member);
 
         verifyReactionOwner(boardReaction, member);
 
@@ -112,12 +112,31 @@ public class BoardReactionServiceImpl
         Board board = getBoardEntity(boardId);
         Member member = getMemberEntity(memberId);
 
-        BoardReaction boardReaction = boardReactionRepository.findByBoardAndMember(board, member)
-                .orElseThrow(() -> new ResourceNotFoundException(BOARD_REACTION_NOT_FOUND));
+        BoardReaction boardReaction = getBoardReactionEntity(board, member);
 
         verifyReactionOwner(boardReaction, member);
 
         boardReactionRepository.delete(boardReaction);
+    }
+
+    private Member getMemberEntity(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new ResourceNotFoundException(MEMBER_NOT_FOUND));
+    }
+
+    private Board getBoardEntity(Long boardId) {
+        return boardRepository.findById(boardId)
+                .orElseThrow(() -> new ResourceNotFoundException(BOARD_NOT_FOUND));
+    }
+
+    private BoardReaction getBoardReactionEntity(Board board, Member member) {
+        return boardReactionRepository.findByBoardAndMember(board, member)
+                .orElseThrow(() -> new ResourceNotFoundException(BOARD_REACTION_NOT_FOUND));
+    }
+
+    private void verifyReactionOwner(BoardReaction reaction, Member member) {
+        if (!Objects.equals(reaction.getMember(), member))
+            throw new UnauthorizedResourceProcessException(UNAUTHORIZED_BOARD_REACTION_PROCESS);
     }
 
     private boolean checkReactionExistence(
@@ -128,22 +147,5 @@ public class BoardReactionServiceImpl
                 board,
                 member
         );
-    }
-
-    private void verifyReactionOwner(BoardReaction reaction, Member member) {
-        if (!Objects.equals(reaction.getMember(), member))
-            throw new UnauthorizedResourceAccessException();
-    }
-
-    @Transactional(readOnly = true)
-    public Board getBoardEntity(Long boardId) {
-        return boardRepository.findById(boardId)
-                .orElseThrow(() -> new ResourceNotFoundException(BOARD_NOT_FOUND));
-    }
-
-    @Transactional(readOnly = true)
-    public Member getMemberEntity(Long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new ResourceNotFoundException(MEMBER_NOT_FOUND));
     }
 }

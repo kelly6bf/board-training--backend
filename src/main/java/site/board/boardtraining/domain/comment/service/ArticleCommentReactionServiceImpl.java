@@ -2,15 +2,17 @@ package site.board.boardtraining.domain.comment.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import site.board.boardtraining.domain.article.exception.ArticleErrorCode;
 import site.board.boardtraining.domain.comment.entity.ArticleComment;
 import site.board.boardtraining.domain.comment.entity.ArticleCommentReaction;
 import site.board.boardtraining.domain.comment.exception.ArticleCommentBusinessException;
+import site.board.boardtraining.domain.comment.exception.ArticleCommentErrorCode;
 import site.board.boardtraining.domain.comment.repository.ArticleCommentReactionRepository;
 import site.board.boardtraining.domain.comment.repository.ArticleCommentRepository;
 import site.board.boardtraining.domain.member.entity.Member;
 import site.board.boardtraining.domain.member.repository.MemberRepository;
 import site.board.boardtraining.global.exception.ResourceNotFoundException;
-import site.board.boardtraining.global.exception.UnauthorizedResourceAccessException;
+import site.board.boardtraining.global.exception.UnauthorizedResourceProcessException;
 
 import java.util.Objects;
 
@@ -70,9 +72,7 @@ public class ArticleCommentReactionServiceImpl
 
         ArticleComment articleComment = getArticleCommentEntity(articleCommentId);
         Member member = getMemberEntity(memberId);
-
-        ArticleCommentReaction articleCommentReaction = articleCommentReactionRepository.findByArticleCommentAndMember(articleComment, member)
-                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_COMMENT_REACTION_NOT_FOUND));
+        ArticleCommentReaction articleCommentReaction = getArticleCommentReactionEntity(articleComment, member);
 
         verifyReactionOwner(articleCommentReaction, member);
 
@@ -110,11 +110,29 @@ public class ArticleCommentReactionServiceImpl
 
         ArticleComment articleComment = getArticleCommentEntity(articleCommentId);
         Member member = getMemberEntity(memberId);
-
-        ArticleCommentReaction articleCommentReaction = articleCommentReactionRepository.findByArticleCommentAndMember(articleComment, member)
-                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_COMMENT_REACTION_NOT_FOUND));
+        ArticleCommentReaction articleCommentReaction = getArticleCommentReactionEntity(articleComment, member);
 
         articleCommentReactionRepository.delete(articleCommentReaction);
+    }
+
+    private Member getMemberEntity(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new ResourceNotFoundException(MEMBER_NOT_FOUND));
+    }
+
+    private ArticleComment getArticleCommentEntity(Long articleCommentId) {
+        return articleCommentRepository.findById(articleCommentId)
+                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_COMMENT_NOT_FOUND));
+    }
+
+    private ArticleCommentReaction getArticleCommentReactionEntity(ArticleComment articleComment, Member member) {
+        return articleCommentReactionRepository.findByArticleCommentAndMember(articleComment, member)
+                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_COMMENT_REACTION_NOT_FOUND));
+    }
+
+    private void verifyReactionOwner(ArticleCommentReaction reaction, Member member) {
+        if (!Objects.equals(reaction.getMember(), member))
+            throw new UnauthorizedResourceProcessException(UNAUTHORIZED_ARTICLE_COMMENT_REACTION_PROCESS);
     }
 
     private boolean checkReactionExistence(
@@ -125,22 +143,5 @@ public class ArticleCommentReactionServiceImpl
                 articleComment,
                 member
         );
-    }
-
-    private void verifyReactionOwner(ArticleCommentReaction reaction, Member member) {
-        if (!Objects.equals(reaction.getMember(), member))
-            throw new UnauthorizedResourceAccessException();
-    }
-
-    @Transactional(readOnly = true)
-    public ArticleComment getArticleCommentEntity(Long articleCommentId) {
-        return articleCommentRepository.findById(articleCommentId)
-                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_COMMENT_NOT_FOUND));
-    }
-
-    @Transactional(readOnly = true)
-    public Member getMemberEntity(Long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new ResourceNotFoundException(MEMBER_NOT_FOUND));
     }
 }
