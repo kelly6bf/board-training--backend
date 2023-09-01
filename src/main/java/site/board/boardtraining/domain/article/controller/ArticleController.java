@@ -19,6 +19,8 @@ import site.board.boardtraining.global.response.success.MultipleSuccessApiRespon
 import site.board.boardtraining.global.response.success.SingleSuccessApiResponse;
 import site.board.boardtraining.global.response.success.SuccessApiResponse;
 
+import java.util.LinkedHashSet;
+
 @RestController
 public class ArticleController {
     private final ArticleService articleService;
@@ -35,17 +37,19 @@ public class ArticleController {
     @GetMapping("/api/boards/{board-id}/articles")
     public ResponseEntity<MultipleSuccessApiResponse<ArticleDto>> searchArticles(
             @PathVariable("board-id") Long boardId,
-            @RequestParam(required = false) String searchKeyword,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+            @RequestParam(value = "keyword", required = false, defaultValue = "") String searchKeyword,
+            @RequestParam(value = "tag", required = false, defaultValue = "") LinkedHashSet<String> hashtags,
+            @PageableDefault(size = 15, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.ok(
                 MultipleSuccessApiResponse.of(
                         "성공적으로 게시글이 조회되었습니다.",
                         articleService.searchArticles(
                                 SearchArticlesDto.of(
-                                        pageable,
                                         boardId,
-                                        searchKeyword
+                                        searchKeyword,
+                                        hashtags,
+                                        pageable
                                 )
                         ).getContent()
                 )

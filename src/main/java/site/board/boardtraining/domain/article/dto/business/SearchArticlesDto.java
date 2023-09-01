@@ -2,20 +2,25 @@ package site.board.boardtraining.domain.article.dto.business;
 
 import org.springframework.data.domain.Pageable;
 
+import java.util.Set;
+
 public record SearchArticlesDto(
-        Pageable pageable,
         Long boardId,
-        String searchKeyword
+        String searchKeyword,
+        Set<String> hashtags,
+        Pageable pageable
 ) {
     public static SearchArticlesDto of(
-            Pageable pageable,
             Long boardId,
-            String searchKeyword
+            String searchKeyword,
+            Set<String> hashtags,
+            Pageable pageable
     ) {
         return new SearchArticlesDto(
-                pageable,
                 boardId,
-                searchKeyword
+                searchKeyword,
+                hashtags,
+                pageable
         );
     }
 }
