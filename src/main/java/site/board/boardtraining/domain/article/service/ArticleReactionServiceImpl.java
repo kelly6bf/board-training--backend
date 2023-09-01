@@ -38,15 +38,6 @@ public class ArticleReactionServiceImpl
         this.memberRepository = memberRepository;
     }
 
-    @Transactional(readOnly = true)
-    @Override
-    public int getArticleLikeCount(Article article) {
-        return articleReactionRepository.countAllByTypeAndArticle(
-                LIKE,
-                article
-        );
-    }
-
     @Override
     public void addArticleLike(Long articleId, Long memberId) {
 
@@ -75,15 +66,6 @@ public class ArticleReactionServiceImpl
         verifyReactionOwner(articleReaction, member);
 
         articleReactionRepository.delete(articleReaction);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public int getArticleDislikeCount(Article article) {
-        return articleReactionRepository.countAllByTypeAndArticle(
-                DISLIKE,
-                article
-        );
     }
 
     @Override
