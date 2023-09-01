@@ -14,6 +14,7 @@ public record ArticleDto(
         LinkedHashSet<String> hashtags,
         Integer likeCount,
         Integer dislikeCount,
+        Integer commentsCount,
         MemberDto member,
         LocalDateTime createdAt
 ) {
@@ -25,6 +26,7 @@ public record ArticleDto(
             LinkedHashSet<String> hashtags,
             Integer likeCount,
             Integer dislikeCount,
+            Integer commentsCount,
             MemberDto member,
             LocalDateTime createdAt
     ) {
@@ -36,6 +38,7 @@ public record ArticleDto(
                 hashtags,
                 likeCount,
                 dislikeCount,
+                commentsCount,
                 member,
                 createdAt
         );
@@ -45,7 +48,8 @@ public record ArticleDto(
             Article article,
             LinkedHashSet<String> hashtags,
             Integer likeCount,
-            Integer dislikeCount
+            Integer dislikeCount,
+            Integer commentsCount
     ) {
         return new ArticleDto(
                 article.getId(),
@@ -55,6 +59,7 @@ public record ArticleDto(
                 hashtags,
                 likeCount,
                 dislikeCount,
+                commentsCount,
                 MemberDto.from(article.getMember()),
                 article.getCreatedAt()
         );
