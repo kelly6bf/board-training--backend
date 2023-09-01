@@ -1,6 +1,7 @@
 package site.board.boardtraining.domain.article.service;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.board.boardtraining.domain.article.dto.business.*;
@@ -13,6 +14,8 @@ import site.board.boardtraining.domain.member.entity.Member;
 import site.board.boardtraining.domain.member.repository.MemberRepository;
 import site.board.boardtraining.global.exception.ResourceNotFoundException;
 import site.board.boardtraining.global.exception.UnauthorizedResourceProcessException;
+
+import java.util.Set;
 
 import static site.board.boardtraining.domain.article.exception.ArticleErrorCode.ARTICLE_NOT_FOUND;
 import static site.board.boardtraining.domain.article.exception.ArticleErrorCode.UNAUTHORIZED_ARTICLE_PROCESS;
@@ -46,32 +49,17 @@ public class ArticleServiceImpl
     @Transactional(readOnly = true)
     @Override
     public Page<ArticleDto> searchArticles(SearchArticlesDto dto) {
-        if (dto.searchKeyword() == null || dto.searchKeyword().isBlank()) {
-            return articleRepository.findAll(dto.pageable())
-                    .map(article ->
-                            ArticleDto.from(
-                                    article,
-                                    hashtagService.getAllArticleHashtags(article),
-                                    articleReactionService.getArticleLikeCount(article),
-                                    articleReactionService.getArticleDislikeCount(article)
-                            )
-                    );
-        }
-
-        return articleRepository.findByBoardAndTitleContainingOrContentContaining(
-                        getBoardEntity(dto.boardId()),
-                        dto.searchKeyword(),
-                        dto.searchKeyword(),
-                        dto.pageable()
-                )
-                .map(article ->
-                        ArticleDto.from(
-                                article,
-                                hashtagService.getAllArticleHashtags(article),
-                                articleReactionService.getArticleLikeCount(article),
-                                articleReactionService.getArticleDislikeCount(article)
-                        )
-                );
+        return findArticlesBySearchConditions(
+                dto.searchKeyword(),
+                dto.hashtags(),
+                dto.pageable()
+        )
+                .map(article -> ArticleDto.from(
+                        article,
+                        hashtagService.getAllArticleHashtags(article),
+                        articleReactionService.getArticleLikeCount(article),
+                        articleReactionService.getArticleDislikeCount(article)
+                ));
     }
 
     @Transactional(readOnly = true)
@@ -155,5 +143,32 @@ public class ArticleServiceImpl
     ) {
         if (!article.getMember().getId().equals(memberId))
             throw new UnauthorizedResourceProcessException(UNAUTHORIZED_ARTICLE_PROCESS);
+    }
+
+    private Page<Article> findArticlesBySearchConditions(
+            String searchKeyword,
+            Set<String> hashtags,
+            Pageable pageable
+    ) {
+        // keyword && hashtag
+        if (!searchKeyword.isBlank() && !hashtags.isEmpty()) {
+            return articleRepository.searchArticlesByKeywordAndHashtag(
+                    searchKeyword,
+                    hashtags,
+                    pageable
+            );
+        } else if (!searchKeyword.isBlank()) {  // keyword search
+            return articleRepository.searchArticlesByKeyword(
+                    searchKeyword,
+                    pageable
+            );
+        } else if (!hashtags.isEmpty()) {   // hashtag search
+            return articleRepository.searchArticlesByHashtag(
+                    hashtags,
+                    pageable
+            );
+        } else {    // get all
+            return articleRepository.findAll(pageable);
+        }
     }
 }

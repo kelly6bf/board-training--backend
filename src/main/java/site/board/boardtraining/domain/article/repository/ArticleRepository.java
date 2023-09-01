@@ -9,7 +9,8 @@ import site.board.boardtraining.domain.board.entity.Board;
 
 public interface ArticleRepository
         extends JpaRepository<Article, Long>,
-        QuerydslPredicateExecutor<Article> {
-
+        QuerydslPredicateExecutor<Article>,
+        ArticleRepositoryCustom
+{
     Page<Article> findByBoardAndTitleContainingOrContentContaining(Board board, String title, String content, Pageable pageable);
 }
