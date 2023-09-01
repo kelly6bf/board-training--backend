@@ -6,9 +6,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.board.boardtraining.domain.article.dto.business.*;
 import site.board.boardtraining.domain.article.entity.Article;
+import site.board.boardtraining.domain.article.repository.ArticleReactionRepository;
 import site.board.boardtraining.domain.article.repository.ArticleRepository;
 import site.board.boardtraining.domain.board.entity.Board;
 import site.board.boardtraining.domain.board.repository.BoardRepository;
+import site.board.boardtraining.domain.comment.repository.ArticleCommentRepository;
 import site.board.boardtraining.domain.hashtag.service.HashtagService;
 import site.board.boardtraining.domain.member.entity.Member;
 import site.board.boardtraining.domain.member.repository.MemberRepository;
@@ -17,6 +19,8 @@ import site.board.boardtraining.global.exception.UnauthorizedResourceProcessExce
 
 import java.util.Set;
 
+import static site.board.boardtraining.domain.article.constant.ArticleReactionType.DISLIKE;
+import static site.board.boardtraining.domain.article.constant.ArticleReactionType.LIKE;
 import static site.board.boardtraining.domain.article.exception.ArticleErrorCode.ARTICLE_NOT_FOUND;
 import static site.board.boardtraining.domain.article.exception.ArticleErrorCode.UNAUTHORIZED_ARTICLE_PROCESS;
 import static site.board.boardtraining.domain.board.exception.BoardErrorCode.BOARD_NOT_FOUND;
@@ -29,21 +33,24 @@ public class ArticleServiceImpl
     private final ArticleRepository articleRepository;
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
+    private final ArticleReactionRepository articleReactionRepository;
+    private final ArticleCommentRepository articleCommentRepository;
     private final HashtagService hashtagService;
-    private final ArticleReactionService articleReactionService;
 
     public ArticleServiceImpl(
             ArticleRepository articleRepository,
             BoardRepository boardRepository,
             MemberRepository memberRepository,
             HashtagService hashtagService,
-            ArticleReactionService articleReactionService
+            ArticleReactionRepository articleReactionRepository,
+            ArticleCommentRepository articleCommentRepository
     ) {
         this.articleRepository = articleRepository;
         this.boardRepository = boardRepository;
         this.memberRepository = memberRepository;
         this.hashtagService = hashtagService;
-        this.articleReactionService = articleReactionService;
+        this.articleReactionRepository = articleReactionRepository;
+        this.articleCommentRepository = articleCommentRepository;
     }
 
     @Transactional(readOnly = true)
@@ -57,8 +64,9 @@ public class ArticleServiceImpl
                 .map(article -> ArticleDto.from(
                         article,
                         hashtagService.getAllArticleHashtags(article),
-                        articleReactionService.getArticleLikeCount(article),
-                        articleReactionService.getArticleDislikeCount(article)
+                        articleReactionRepository.countAllByTypeAndArticle(LIKE, article),
+                        articleReactionRepository.countAllByTypeAndArticle(DISLIKE, article),
+                        articleCommentRepository.countAllByArticle(article)
                 ));
     }
 
@@ -70,8 +78,9 @@ public class ArticleServiceImpl
         return ArticleDto.from(
                 article,
                 hashtagService.getAllArticleHashtags(article),
-                articleReactionService.getArticleLikeCount(article),
-                articleReactionService.getArticleDislikeCount(article)
+                articleReactionRepository.countAllByTypeAndArticle(LIKE, article),
+                articleReactionRepository.countAllByTypeAndArticle(DISLIKE, article),
+                articleCommentRepository.countAllByArticle(article)
         );
     }
 

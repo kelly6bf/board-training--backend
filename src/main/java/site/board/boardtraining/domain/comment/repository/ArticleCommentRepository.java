@@ -15,4 +15,6 @@ public interface ArticleCommentRepository
     List<ArticleComment> findAllByArticleAndCommentType(Article article, ArticleCommentType commentType);
 
     List<ArticleComment> findAllByParentCommentId(Long parentCommentId);
+
+    int countAllByArticle(Article article);
 }
